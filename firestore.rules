@@ -1,0 +1,154 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function myProfile() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+    }
+
+    function isAdmin() {
+      return isSignedIn() && myProfile().role == 'admin';
+    }
+
+    function isOwner(uid) {
+      return isSignedIn() && request.auth.uid == uid;
+    }
+
+    // The developer's own Google account — update this if you ever sign in
+    // with a different one. Kept separate from the "admin" role so a school
+    // admin can never accidentally lock everyone else out.
+    function isDeveloper() {
+      return isSignedIn() && request.auth.token.email == 'amirul.aimanz2001@gmail.com';
+    }
+
+    // True once the caller's own schoolId matches the given one — the
+    // multi-tenancy boundary. Every school-owned collection below is scoped
+    // by this on both read and create.
+    function belongsToSchool(schoolId) {
+      return isSignedIn() && myProfile().schoolId == schoolId;
+    }
+
+    // Read-rule guard for a specific document that might not exist yet (e.g.
+    // checking today's assembly_sessions doc, or a curriculum_links slug
+    // before it's ever been set). Without this, Firestore has no `resource`
+    // to evaluate belongsToSchool() against on a nonexistent doc, the rule
+    // throws, and the client sees a false "permission-denied" instead of a
+    // normal "not found" — reading that nothing exists here isn't a leak.
+    function existsAndBelongsToSchool(schoolId) {
+      return resource == null || belongsToSchool(schoolId);
+    }
+
+    // An admin (of the same school) or the developer account may create/manage
+    // records on behalf of any teacher — used for admin data entry and for the
+    // Developer Controls sample-data seeder.
+    function canManageSchool(schoolId) {
+      return isDeveloper() || (isAdmin() && belongsToSchool(schoolId));
+    }
+
+    // Staff profiles. Anyone signed in can read (needed for name lookups / dashboards).
+    // A user may create their own doc (role "guru", schoolId set); an admin or
+    // the developer may also create profile docs on behalf of others (e.g. the
+    // sample-data seeder's fake teachers). Promoting someone to "admin" must be
+    // done manually in the Firebase Console, or by an existing admin.
+    match /users/{uid} {
+      allow read: if isSignedIn();
+      allow create: if request.resource.data.role == 'guru'
+        && request.resource.data.schoolId is string && request.resource.data.schoolId.size() > 0
+        && (isOwner(uid) || canManageSchool(request.resource.data.schoolId));
+      allow update: if isAdmin() ||
+        (isOwner(uid) && request.resource.data.role == resource.data.role
+          && request.resource.data.schoolId == resource.data.schoolId);
+    }
+
+    // e-RPH daily lesson-plan submissions.
+    match /erph/{docId} {
+      allow read: if existsAndBelongsToSchool(resource.data.schoolId);
+      allow create: if belongsToSchool(request.resource.data.schoolId)
+        && (request.resource.data.teacherUid == request.auth.uid || canManageSchool(request.resource.data.schoolId));
+      allow update, delete: if isAdmin() || isOwner(resource.data.teacherUid);
+    }
+
+    // MMI classroom check-in logs.
+    match /mmi/{docId} {
+      allow read: if existsAndBelongsToSchool(resource.data.schoolId);
+      allow create: if belongsToSchool(request.resource.data.schoolId)
+        && (request.resource.data.teacherUid == request.auth.uid || canManageSchool(request.resource.data.schoolId));
+      allow update, delete: if isAdmin() || isOwner(resource.data.teacherUid);
+    }
+
+    // One document per day holding the assembly check-in code. Only admins can set it.
+    match /assembly_sessions/{sessionId} {
+      allow read: if existsAndBelongsToSchool(resource.data.schoolId);
+      allow write: if canManageSchool(request.resource.data.schoolId);
+    }
+
+    // Individual assembly check-ins. A teacher may only create their own.
+    match /assembly_checkins/{docId} {
+      allow read: if existsAndBelongsToSchool(resource.data.schoolId);
+      allow create: if belongsToSchool(request.resource.data.schoolId)
+        && (request.resource.data.teacherUid == request.auth.uid || canManageSchool(request.resource.data.schoolId));
+      allow update, delete: if isAdmin();
+    }
+
+    // Co-curriculum meeting reports (Badan Beruniform / Kelab & Persatuan /
+    // Sukan & Permainan / Rumah Sukan) and the standalone attendance log.
+    match /coco_reports/{docId} {
+      allow read: if existsAndBelongsToSchool(resource.data.schoolId);
+      allow create: if belongsToSchool(request.resource.data.schoolId)
+        && (request.resource.data.teacherUid == request.auth.uid || canManageSchool(request.resource.data.schoolId));
+      allow update, delete: if isAdmin() || isOwner(resource.data.teacherUid);
+    }
+
+    match /coco_attendance/{docId} {
+      allow read: if existsAndBelongsToSchool(resource.data.schoolId);
+      allow create: if belongsToSchool(request.resource.data.schoolId)
+        && (request.resource.data.teacherUid == request.auth.uid || canManageSchool(request.resource.data.schoolId));
+      allow update, delete: if isAdmin() || isOwner(resource.data.teacherUid);
+    }
+
+    // Weekly teaching timetable. Any teacher may add their own lesson slots;
+    // only the owner or an admin may edit/remove them.
+    match /timetable/{docId} {
+      allow read: if existsAndBelongsToSchool(resource.data.schoolId);
+      allow create: if belongsToSchool(request.resource.data.schoolId)
+        && (request.resource.data.teacherUid == request.auth.uid || canManageSchool(request.resource.data.schoolId));
+      allow update, delete: if isAdmin() || isOwner(resource.data.teacherUid);
+    }
+
+    // Student roster — admin-managed only.
+    match /students/{docId} {
+      allow read: if (isAdmin() || isDeveloper()) && existsAndBelongsToSchool(resource.data.schoolId);
+      allow write: if canManageSchool(request.resource.data.schoolId);
+    }
+
+    // Subject-panel e-folder links — visible to all staff, editable by admins.
+    match /curriculum_links/{docId} {
+      allow read: if existsAndBelongsToSchool(resource.data.schoolId);
+      allow write: if canManageSchool(request.resource.data.schoolId);
+    }
+
+    // In-app notification feed. Any signed-in user may post one (targeted by
+    // toRole/toUid) and mark their own as read; nobody may delete them here.
+    match /notifications/{docId} {
+      allow read: if existsAndBelongsToSchool(resource.data.schoolId);
+      allow create: if isSignedIn() && belongsToSchool(request.resource.data.schoolId);
+      allow update: if isSignedIn() && belongsToSchool(resource.data.schoolId) &&
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['readBy']);
+    }
+
+    // System-wide kill switch (see AuthContext + Profile > Developer
+    // Controls). Everyone signed in can read it so the app can react
+    // instantly; only the developer account can flip it. Stays global/
+    // cross-tenant on purpose — this is a developer feature, not a
+    // per-school one.
+    match /system/{docId} {
+      allow read: if isSignedIn();
+      allow write: if isDeveloper();
+    }
+  }
+}
