@@ -111,7 +111,7 @@ export default function Landing() {
       <main>
         <section className="landing-hero">
           <div className="landing-hero-inner">
-            <div className="landing-hero-copy">
+            <Reveal className="landing-hero-copy">
               <p className="landing-kicker">{c.kicker}</p>
               <h1>{c.heroTitle}</h1>
               <p className="landing-hero-body">{c.heroBody}</p>
@@ -130,9 +130,9 @@ export default function Landing() {
                   </li>
                 ))}
               </ul>
-            </div>
+            </Reveal>
 
-            <div className="landing-hero-visual">
+            <Reveal className="landing-hero-visual" delay={120}>
               <figure className="landing-browser">
                 <div className="landing-browser-bar" aria-hidden="true">
                   <span /><span /><span />
@@ -156,7 +156,7 @@ export default function Landing() {
                 </span>
               </div>
               <p className="landing-shot-caption">{c.shotCaption}</p>
-            </div>
+            </Reveal>
           </div>
         </section>
 

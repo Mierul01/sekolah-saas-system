@@ -9,7 +9,8 @@
    - Cards are tinted tiles with an icon square and a small preview of a real
      screen (email field, chart, role pills, module chips), like the dashboard
      tiles, instead of plain white boxes.
-   - Poppins / Inter: the system's fonts. Normal cursor; sections fade in once.
+   - Poppins / Inter: the system's fonts. Normal cursor; sections and cards
+     fade in every time they scroll into view (down or back up).
    ========================================================================== */
 
 .landing { background: #fff; color: var(--ink-700); font-size: 14.5px; overflow-x: clip; }
@@ -25,7 +26,7 @@
 .tone-card-navy { --solid: var(--navy-solid); --soft: var(--navy-soft); --edge: var(--navy-edge); }
 .tone-card-red { --solid: var(--red-solid); --soft: var(--red-soft); --edge: var(--red-edge); }
 
-/* Scroll-in once (Reveal component) */
+/* Scroll-in, replayed each time an element comes back into view (Reveal) */
 .landing .reveal { opacity: 0; transform: translateY(18px); transition: opacity .55s var(--ease), transform .55s var(--ease); }
 .landing .reveal.is-visible { opacity: 1; transform: none; }
 @media (prefers-reduced-motion: reduce) { .landing .reveal { opacity: 1; transform: none; transition: none; } }

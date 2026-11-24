@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 
-// Fades/slides an element in the first time it scrolls into view, then
-// leaves it alone — the observer disconnects after triggering once, so
-// scrolling back up and down past a section never replays the animation.
+// Fades/slides an element in whenever it scrolls into view, and resets it once
+// it has left the screen, so the animation plays again every time the reader
+// scrolls back to it (down or up). Under "reduce motion" it simply shows.
 export default function Reveal({ children, className = '', delay = 0, ...rest }) {
   const ref = useRef(null)
   const [visible, setVisible] = useState(false)
@@ -15,20 +15,21 @@ export default function Reveal({ children, className = '', delay = 0, ...rest })
       return
     }
     const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setVisible(true)
-          observer.disconnect()
-        }
-      },
-      { threshold: 0.15, rootMargin: '0px 0px -40px 0px' }
+      ([entry]) => setVisible(entry.isIntersecting),
+      { threshold: 0.12, rootMargin: '0px 0px -40px 0px' }
     )
     observer.observe(el)
     return () => observer.disconnect()
   }, [])
 
   return (
-    <div ref={ref} className={`reveal ${visible ? 'is-visible' : ''} ${className}`} style={{ transitionDelay: `${delay}ms` }} {...rest}>
+    <div
+      ref={ref}
+      className={`reveal ${visible ? 'is-visible' : ''} ${className}`}
+      // The stagger delay only applies on the way in; leaving resets instantly.
+      style={{ transitionDelay: visible ? `${delay}ms` : '0ms' }}
+      {...rest}
+    >
       {children}
     </div>
   )
