@@ -1,5 +1,7 @@
-import { useState } from 'react'
-import { Link, Navigate } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import TransitionLink from '../components/TransitionLink'
+import { playPageWipe } from '../lib/pageTransition'
 import { useAuth } from '../context/AuthContext'
 import { useLanguage } from '../context/LanguageContext'
 import { PRODUCT_NAME, SCHOOL_NAME, ALLOWED_EMAIL_DOMAIN, firebaseReady } from '../lib/firebase'
@@ -224,18 +226,23 @@ export default function Login() {
   const { user, loading, error, signInWithGoogle } = useAuth()
   const { t } = useLanguage()
   const [tab, setTab] = useState('login')
+  const navigate = useNavigate()
+
+  // Signed in (just now, or already): wipe into the system instead of jumping.
+  useEffect(() => {
+    if (!loading && user) playPageWipe(navigate, '/app', { replace: true })
+  }, [loading, user, navigate])
 
   if (loading) return <div className="page-loading">{t('common.loading')}</div>
-  if (user) return <Navigate to="/app" replace />
 
   return (
     <div className="login-screen">
       <div className="login-showcase">
         <div className="login-showcase-top">
-          <Link to="/" className="login-showcase-brand">
+          <TransitionLink to="/" className="login-showcase-brand">
             <BrandMark />
             <strong>{PRODUCT_NAME}</strong>
-          </Link>
+          </TransitionLink>
           <h1>{t('login.showcaseTitle')}</h1>
           <p>{t('login.showcaseBody')}</p>
         </div>
@@ -245,10 +252,10 @@ export default function Login() {
       <div className="login-form-panel">
         <div className="login-form-panel-inner">
           <div className="login-top-row">
-            <Link to="/" className="login-back-link">
+            <TransitionLink to="/" className="login-back-link">
               <Icon path="M19 12H5M12 19l-7-7 7-7" />
               {t('login.backToHome')}
-            </Link>
+            </TransitionLink>
             <LanguageSwitcher />
           </div>
 
@@ -276,20 +283,23 @@ export default function Login() {
             </>
           )}
 
-          <div className="auth-tabs">
-            <button className={`auth-tab ${tab === 'login' ? 'active' : ''}`} onClick={() => setTab('login')} type="button">
+          {/* data-tab moves the sliding highlight; the keyed pane replays its slide-in on every switch. */}
+          <div className="auth-tabs" data-tab={tab}>
+            <button className={`auth-tab ${tab === 'login' ? 'active' : ''}`} onClick={() => setTab('login')} type="button" aria-pressed={tab === 'login'}>
               {t('login.tabLogin')}
             </button>
-            <button className={`auth-tab ${tab === 'register' ? 'active' : ''}`} onClick={() => setTab('register')} type="button">
+            <button className={`auth-tab ${tab === 'register' ? 'active' : ''}`} onClick={() => setTab('register')} type="button" aria-pressed={tab === 'register'}>
               {t('login.tabRegister')}
             </button>
           </div>
 
-          {tab === 'login' ? (
-            <LoginForm switchToRegister={() => setTab('register')} />
-          ) : (
-            <RegisterForm switchToLogin={() => setTab('login')} onDone={() => {}} />
-          )}
+          <div key={tab} className={`auth-pane auth-pane-${tab}`}>
+            {tab === 'login' ? (
+              <LoginForm switchToRegister={() => setTab('register')} />
+            ) : (
+              <RegisterForm switchToLogin={() => setTab('login')} onDone={() => {}} />
+            )}
+          </div>
         </div>
       </div>
     </div>

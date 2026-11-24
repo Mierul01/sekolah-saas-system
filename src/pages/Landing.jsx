@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
+import TransitionLink from '../components/TransitionLink'
 import { PRODUCT_NAME } from '../lib/firebase'
 import { useLanguage } from '../context/LanguageContext'
 import BrandMark from '../components/BrandMark'
@@ -84,16 +84,16 @@ export default function Landing() {
     <div className="landing">
       <header className="landing-nav">
         <div className="landing-nav-inner">
-          <Link to="/" className="landing-brand">
+          <a href="#top" className="landing-brand">
             <BrandMark />
             <strong>{PRODUCT_NAME}</strong>
-          </Link>
+          </a>
           <nav className="landing-links" aria-label={c.menu}>
             {navLinks.map((l) => <a key={l.href} href={l.href}>{l.label}</a>)}
           </nav>
           <div className="landing-nav-actions">
             <LanguageSwitcher />
-            <Link to="/login" className="landing-btn landing-btn-navy">{c.login}</Link>
+            <TransitionLink to="/login" className="landing-btn landing-btn-navy">{c.login}</TransitionLink>
           </div>
           <button type="button" className="landing-menu-btn" onClick={() => setMenuOpen((o) => !o)} aria-expanded={menuOpen} aria-label={menuOpen ? c.closeMenu : c.menu}>
             <Icon path={menuOpen ? ICONS.close : ICONS.menu} size={22} />
@@ -103,12 +103,12 @@ export default function Landing() {
           <div className="landing-mobile-menu">
             {navLinks.map((l) => <a key={l.href} href={l.href} onClick={() => setMenuOpen(false)}>{l.label}</a>)}
             <LanguageSwitcher />
-            <Link to="/login" className="landing-btn landing-btn-navy" onClick={() => setMenuOpen(false)}>{c.login}</Link>
+            <TransitionLink to="/login" className="landing-btn landing-btn-navy" onClick={() => setMenuOpen(false)}>{c.login}</TransitionLink>
           </div>
         )}
       </header>
 
-      <main>
+      <main id="top">
         <section className="landing-hero">
           <div className="landing-hero-inner">
             <Reveal className="landing-hero-copy">
@@ -116,7 +116,7 @@ export default function Landing() {
               <h1>{c.heroTitle}</h1>
               <p className="landing-hero-body">{c.heroBody}</p>
               <div className="landing-hero-actions">
-                <Link to="/login" className="landing-btn landing-btn-gold landing-btn-lg">{c.loginNow}</Link>
+                <TransitionLink to="/login" className="landing-btn landing-btn-gold landing-btn-lg">{c.loginNow}</TransitionLink>
                 <a href="#modul" className="landing-btn landing-btn-outline landing-btn-lg">{c.viewModules}</a>
               </div>
               <ul className="landing-stats">
@@ -265,8 +265,8 @@ export default function Landing() {
               <p>{c.ctaDesc}</p>
             </div>
             <div className="landing-hero-actions">
-              <Link to="/login" className="landing-btn landing-btn-gold landing-btn-lg">{c.loginNow}</Link>
-              <Link to="/support" className="landing-btn landing-btn-outline landing-btn-lg">{c.ctaSupport}</Link>
+              <TransitionLink to="/login" className="landing-btn landing-btn-gold landing-btn-lg">{c.loginNow}</TransitionLink>
+              <TransitionLink to="/support" className="landing-btn landing-btn-outline landing-btn-lg">{c.ctaSupport}</TransitionLink>
             </div>
           </div>
         </section>
@@ -285,13 +285,13 @@ export default function Landing() {
             <h4>{c.footerProduct}</h4>
             <a href="#ciri-ciri">{c.navFeatures}</a>
             <a href="#modul">{c.navModules}</a>
-            <Link to="/login">{c.login}</Link>
+            <TransitionLink to="/login">{c.login}</TransitionLink>
           </div>
           <div className="landing-footer-col">
             <h4>{c.footerLegal}</h4>
-            <Link to="/pdpa">{c.privacy}</Link>
-            <Link to="/terms">{c.terms}</Link>
-            <Link to="/support">{c.support}</Link>
+            <TransitionLink to="/pdpa">{c.privacy}</TransitionLink>
+            <TransitionLink to="/terms">{c.terms}</TransitionLink>
+            <TransitionLink to="/support">{c.support}</TransitionLink>
           </div>
         </div>
         <div className="landing-footer-bottom">&copy; {new Date().getFullYear()} {PRODUCT_NAME}. {c.rights}</div>
