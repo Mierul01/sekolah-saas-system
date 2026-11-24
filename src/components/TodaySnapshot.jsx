@@ -4,7 +4,7 @@ import { collection, doc, onSnapshot, query, where, db } from '../lib/db'
 import { useAuth } from '../context/AuthContext'
 import { useLanguage } from '../context/LanguageContext'
 import { todayStr } from '../lib/constants'
-import { TILE_ICONS } from './StatTile'
+import { TILE_ICONS } from '../lib/tiles'
 
 function Icon({ name }) {
   return (

@@ -6,7 +6,8 @@ import { todayStr } from '../lib/constants'
 import { useAuth } from '../context/AuthContext'
 import { useLanguage } from '../context/LanguageContext'
 import { StatRowSkeleton, ListSkeleton } from './Skeleton'
-import StatTile, { TILE_ICONS, dailyCounts, lastDays } from './StatTile'
+import StatTile from './StatTile'
+import { TILE_ICONS, dailyCounts, lastDays } from '../lib/tiles'
 
 const RECENT_LIMIT = 6
 const NOT_SUBMITTED_LIMIT = 6

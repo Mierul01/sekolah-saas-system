@@ -8,7 +8,8 @@ import SearchableSelect from '../../components/SearchableSelect'
 import { TableSkeleton } from '../../components/Skeleton'
 import ExportButtons from '../../components/ExportButtons'
 import DatePicker from '../../components/DatePicker'
-import StatTile, { dailyCounts } from '../../components/StatTile'
+import StatTile from '../../components/StatTile'
+import { dailyCounts } from '../../lib/tiles'
 import Pagination, { DEFAULT_PAGE_SIZE, PageSizeSelect } from '../../components/Pagination'
 
 export default function CocoDashboard() {

@@ -4,7 +4,8 @@ import { todayStr } from '../lib/constants'
 import { useAuth } from '../context/AuthContext'
 import { useLanguage } from '../context/LanguageContext'
 import { StatRowSkeleton } from './Skeleton'
-import StatTile, { dailyCounts, lastDays } from './StatTile'
+import StatTile from './StatTile'
+import { dailyCounts, lastDays } from '../lib/tiles'
 
 // The signed-in teacher's own last 7 days, one tile per module.
 export default function TeacherOverview() {

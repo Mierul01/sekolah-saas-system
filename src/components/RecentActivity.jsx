@@ -5,7 +5,7 @@ import { useAuth } from '../context/AuthContext'
 import { useLanguage } from '../context/LanguageContext'
 import { formatDateLabel } from '../lib/constants'
 import { ListSkeleton } from './Skeleton'
-import { TILE_ICONS, lastDays } from './StatTile'
+import { TILE_ICONS, lastDays } from '../lib/tiles'
 
 // Only the last 30 days are fetched (Firestore allows up to 30 values in an 'in' filter).
 const RECENT_DAYS = lastDays(30)
