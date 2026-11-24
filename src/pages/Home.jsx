@@ -8,31 +8,30 @@ import RecentActivity from '../components/RecentActivity'
 
 function getModules(t) {
   return [
-    { to: '/app/erph', title: t('home.modErph.title'), desc: t('home.modErph.desc'), color: 'bg-blue', icon: 'M6 2h9l5 5v15a1 1 0 01-1 1H6a1 1 0 01-1-1V3a1 1 0 011-1z' },
-    { to: '/app/mmi', title: t('home.modMmi.title'), desc: t('home.modMmi.desc'), color: 'bg-gold', icon: 'M12 22a10 10 0 100-20 10 10 0 000 20zM12 6v6l4 2' },
-    { to: '/app/perhimpunan', title: t('home.modPerhimpunan.title'), desc: t('home.modPerhimpunan.desc'), color: 'bg-green', icon: 'M5 22V3m0 0h13l-3 5 3 5H5' },
-    { to: '/app/kokurikulum/kehadiran', title: t('home.modKoko.title'), desc: t('home.modKoko.desc'), color: 'bg-teal', icon: 'M12 15a6 6 0 100-12 6 6 0 000 12zM8.5 13.5L7 22l5-3 5 3-1.5-8.5' },
-    { to: '/app/kurikulum', title: t('home.modKurikulum.title'), desc: t('home.modKurikulum.desc'), color: 'bg-navy', icon: 'M4 19.5A2.5 2.5 0 016.5 17H20M4 19.5A2.5 2.5 0 006.5 22H20V2H6.5A2.5 2.5 0 004 4.5v15z' },
+    { to: '/app/erph', title: t('home.modErph.title'), desc: t('home.modErph.desc'), tone: 'blue', icon: 'M6 2h9l5 5v15a1 1 0 01-1 1H6a1 1 0 01-1-1V3a1 1 0 011-1z' },
+    { to: '/app/mmi', title: t('home.modMmi.title'), desc: t('home.modMmi.desc'), tone: 'gold', icon: 'M12 22a10 10 0 100-20 10 10 0 000 20zM12 6v6l4 2' },
+    { to: '/app/perhimpunan', title: t('home.modPerhimpunan.title'), desc: t('home.modPerhimpunan.desc'), tone: 'purple', icon: 'M5 22V3m0 0h13l-3 5 3 5H5' },
+    { to: '/app/kokurikulum/kehadiran', title: t('home.modKoko.title'), desc: t('home.modKoko.desc'), tone: 'teal', icon: 'M12 15a6 6 0 100-12 6 6 0 000 12zM8.5 13.5L7 22l5-3 5 3-1.5-8.5' },
+    { to: '/app/kurikulum', title: t('home.modKurikulum.title'), desc: t('home.modKurikulum.desc'), tone: 'navy', icon: 'M4 19.5A2.5 2.5 0 016.5 17H20M4 19.5A2.5 2.5 0 006.5 22H20V2H6.5A2.5 2.5 0 004 4.5v15z' },
   ]
 }
 
 function Icon({ path }) {
   return (
-    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
       <path d={path} />
     </svg>
   )
 }
 
-function ModuleCard({ mod, openLabel }) {
+function ModuleCard({ mod }) {
   return (
-    <Link to={mod.to} className="module-card" data-color={mod.color}>
-      <div className={`module-icon ${mod.color}`}>
-        <Icon path={mod.icon} />
-      </div>
-      <h3>{mod.title}</h3>
-      <p>{mod.desc}</p>
-      <span className="module-link">{openLabel} <Icon path="M5 12h14M13 6l6 6-6 6" /></span>
+    <Link to={mod.to} className={`module-launch tile-${mod.tone}`}>
+      <span className="tile-icon"><Icon path={mod.icon} /></span>
+      <span className="module-launch-text">
+        <strong>{mod.title}</strong>
+        <span>{mod.desc}</span>
+      </span>
     </Link>
   )
 }
@@ -66,17 +65,17 @@ export default function Home() {
         <AdminOverview />
       ) : (
         <>
-          <TodaySnapshot />
+          <TeacherOverview />
           <div className="teacher-dash-layout">
-            <div>
-              <TeacherOverview />
+            <section className="content-card sheet">
+              <TodaySnapshot />
+              <div className="sheet-divider" />
+              <h2 className="card-heading">{t('home.modules')}</h2>
               <div className="module-grid">
-                {modules.map((m) => <ModuleCard key={m.to} mod={m} openLabel={t('common.open')} />)}
+                {modules.map((m) => <ModuleCard key={m.to} mod={m} />)}
               </div>
-            </div>
-            <aside className="teacher-dash-side">
-              <RecentActivity />
-            </aside>
+            </section>
+            <RecentActivity />
           </div>
         </>
       )}

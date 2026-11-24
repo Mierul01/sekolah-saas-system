@@ -1,80 +1,92 @@
 import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { collection, doc, onSnapshot, query, where, db } from '../lib/db'
 import { useAuth } from '../context/AuthContext'
 import { useLanguage } from '../context/LanguageContext'
 import { todayStr } from '../lib/constants'
+import { TILE_ICONS } from './StatTile'
 
-function Icon({ path }) {
+function Icon({ name }) {
   return (
-    <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d={path} />
+    <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d={TILE_ICONS[name]} />
     </svg>
   )
 }
 
+// Today's three daily duties for the signed-in teacher, each with its
+// status and the button that does it.
 export default function TodaySnapshot() {
   const { user, profile } = useAuth()
   const schoolId = profile?.schoolId
   const { t } = useLanguage()
   const today = todayStr()
-  const [erphToday, setErphToday] = useState(false)
-  const [mmiCount, setMmiCount] = useState(0)
+  const [erphToday, setErphToday] = useState(null)
+  const [mmiCount, setMmiCount] = useState(null)
   const [session, setSession] = useState(undefined)
-  const [checkedIn, setCheckedIn] = useState(false)
+  const [checkedIn, setCheckedIn] = useState(null)
 
   useEffect(() => {
     if (!user || !schoolId) return
-    const q = query(collection(db, 'erph'), where('teacherUid', '==', user.uid), where('schoolId', '==', schoolId))
-    return onSnapshot(q, (snap) => setErphToday(snap.docs.some((d) => d.data().tarikh === today)))
-  }, [user, today, schoolId])
-
-  useEffect(() => {
-    if (!user || !schoolId) return
-    const q = query(collection(db, 'mmi'), where('teacherUid', '==', user.uid), where('schoolId', '==', schoolId))
-    return onSnapshot(q, (snap) => setMmiCount(snap.docs.filter((d) => d.data().tarikh === today).length))
+    const mine = (name, extra) => query(collection(db, name), where('teacherUid', '==', user.uid), where('schoolId', '==', schoolId), extra)
+    const subs = [
+      onSnapshot(mine('erph', where('tarikh', '==', today)), (snap) => setErphToday(!snap.empty), () => setErphToday(false)),
+      onSnapshot(mine('mmi', where('tarikh', '==', today)), (snap) => setMmiCount(snap.docs.length), () => setMmiCount(0)),
+      onSnapshot(mine('assembly_checkins', where('sessionId', '==', today)), (snap) => setCheckedIn(!snap.empty), () => setCheckedIn(false)),
+    ]
+    return () => subs.forEach((unsub) => unsub())
   }, [user, today, schoolId])
 
   useEffect(() => onSnapshot(doc(db, 'assembly_sessions', today), (snap) => {
     setSession(snap.exists() ? snap.data() : null)
-  }), [today])
+  }, () => setSession(null)), [today])
 
-  useEffect(() => {
-    if (!user || !schoolId) return
-    const q = query(collection(db, 'assembly_checkins'), where('teacherUid', '==', user.uid), where('schoolId', '==', schoolId))
-    return onSnapshot(q, (snap) => setCheckedIn(snap.docs.some((d) => d.data().sessionId === today)))
-  }, [user, today, schoolId])
+  const loading = erphToday === null || mmiCount === null || checkedIn === null || session === undefined
+  const sessionOpen = Boolean(session?.active)
+
+  const rows = [
+    {
+      key: 'erph', icon: 'doc', tone: 'blue', label: 'e-RPH', to: '/app/erph',
+      status: erphToday ? t('home.snapshotErphDone') : t('home.snapshotErphPending'),
+      done: erphToday, action: erphToday ? t('home.actionView') : t('home.actionSubmit'),
+    },
+    {
+      key: 'mmi', icon: 'clock', tone: 'gold', label: 'MMI', to: '/app/mmi',
+      status: mmiCount > 0 ? `${mmiCount} ${t('home.snapshotMmiSessions')}` : t('home.snapshotMmiNone'),
+      done: mmiCount > 0, action: t('home.actionLog'),
+    },
+    {
+      key: 'assembly', icon: 'flag', tone: 'purple', label: t('nav.perhimpunan'), to: '/app/perhimpunan',
+      status: !sessionOpen ? t('home.snapshotNoAssembly') : checkedIn ? t('home.snapshotAssemblyDone') : t('home.snapshotAssemblyPending'),
+      done: checkedIn, idle: !sessionOpen && !checkedIn,
+      action: checkedIn || !sessionOpen ? t('home.actionView') : t('home.actionCheckIn'),
+    },
+  ]
 
   return (
-    <div className="snapshot-row">
-      <div className={`snapshot-item ${erphToday ? 'snapshot-good' : 'snapshot-warn'}`}>
-        <div className={`snapshot-icon ${erphToday ? 'bg-green' : 'bg-gold'}`}>
-          <Icon path="M6 2h9l5 5v15a1 1 0 01-1 1H6a1 1 0 01-1-1V3a1 1 0 011-1z" />
+    <>
+      <h2 className="card-heading">{t('home.todayTasks')}</h2>
+      {loading ? (
+        <div className="activity-list">
+          {[0, 1, 2].map((i) => <span key={i} className="skeleton skeleton-text" style={{ height: 30, margin: '6px 0' }} />)}
         </div>
-        <div>
-          <strong>{erphToday ? t('home.snapshotErphDone') : t('home.snapshotErphPending')}</strong>
-          <span>e-RPH</span>
-        </div>
-      </div>
-
-      <div className={`snapshot-item ${mmiCount > 0 ? 'snapshot-good' : ''}`}>
-        <div className={`snapshot-icon ${mmiCount > 0 ? 'bg-green' : 'bg-blue'}`}>
-          <Icon path="M12 22a10 10 0 100-20 10 10 0 000 20zM12 6v6l4 2" />
-        </div>
-        <div>
-          <strong>{mmiCount > 0 ? `${mmiCount} ${t('home.snapshotMmiSessions')}` : t('home.snapshotMmiNone')}</strong>
-          <span>MMI</span>
-        </div>
-      </div>
-
-      <div className={`snapshot-item ${checkedIn ? 'snapshot-good' : session ? 'snapshot-warn' : ''}`}>
-        <div className={`snapshot-icon ${checkedIn ? 'bg-green' : 'bg-purple'}`}>
-          <Icon path="M5 22V3m0 0h13l-3 5 3 5H5" />
-        </div>
-        <div>
-          <strong>{session === null ? t('home.snapshotNoAssembly') : checkedIn ? t('home.snapshotAssemblyDone') : t('home.snapshotAssemblyPending')}</strong>
-          <span>{t('nav.perhimpunan')}</span>
-        </div>
-      </div>
-    </div>
+      ) : (
+        <ul className="line-list">
+          {rows.map((r) => (
+            <li key={r.key} className="line-row line-row-static">
+              <span className={`line-icon tone-${r.tone}`}><Icon name={r.icon} /></span>
+              <span className="line-text">
+                <strong>{r.label}</strong>
+                <span>{r.status}</span>
+              </span>
+              <span className={`status-pill ${r.done ? 'status-pill-done' : r.idle ? 'status-pill-idle' : 'status-pill-pending'}`}>
+                {r.done ? t('home.statusDone') : r.idle ? t('home.statusNone') : t('home.statusPending')}
+              </span>
+              <Link to={r.to} className={r.done || r.idle ? 'btn-line' : 'btn-line btn-line-primary'}>{r.action}</Link>
+            </li>
+          ))}
+        </ul>
+      )}
+    </>
   )
 }

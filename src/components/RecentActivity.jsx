@@ -5,6 +5,10 @@ import { useAuth } from '../context/AuthContext'
 import { useLanguage } from '../context/LanguageContext'
 import { formatDateLabel } from '../lib/constants'
 import { ListSkeleton } from './Skeleton'
+import { TILE_ICONS, lastDays } from './StatTile'
+
+// Only the last 30 days are fetched (Firestore allows up to 30 values in an 'in' filter).
+const RECENT_DAYS = lastDays(30)
 
 function getTime(ts) {
   if (!ts) return 0
@@ -16,9 +20,9 @@ function getTime(ts) {
 
 function getActivityMeta(t) {
   return {
-    erph: { label: 'e-RPH', color: 'bg-blue', to: '/app/erph' },
-    mmi: { label: 'MMI', color: 'bg-gold', to: '/app/mmi' },
-    coco: { label: t('nav.kokurikulum'), color: 'bg-teal', to: '/app/kokurikulum/kehadiran' },
+    erph: { label: 'e-RPH', tone: 'blue', icon: 'doc', to: '/app/erph' },
+    mmi: { label: 'MMI', tone: 'gold', icon: 'clock', to: '/app/mmi' },
+    coco: { label: t('nav.kokurikulum'), tone: 'teal', icon: 'award', to: '/app/kokurikulum/kehadiran' },
   }
 }
 
@@ -47,7 +51,7 @@ export default function RecentActivity() {
 
   useEffect(() => {
     if (!user || !schoolId) return
-    const q = query(collection(db, 'erph'), where('teacherUid', '==', user.uid), where('schoolId', '==', schoolId))
+    const q = query(collection(db, 'erph'), where('teacherUid', '==', user.uid), where('schoolId', '==', schoolId), where('tarikh', 'in', RECENT_DAYS))
     return onSnapshot(q, (snap) => {
       setErph(snap.docs.map((d) => ({ id: d.id, type: 'erph', ...d.data() })))
       setErphLoaded(true)
@@ -56,7 +60,7 @@ export default function RecentActivity() {
 
   useEffect(() => {
     if (!user || !schoolId) return
-    const q = query(collection(db, 'mmi'), where('teacherUid', '==', user.uid), where('schoolId', '==', schoolId))
+    const q = query(collection(db, 'mmi'), where('teacherUid', '==', user.uid), where('schoolId', '==', schoolId), where('tarikh', 'in', RECENT_DAYS))
     return onSnapshot(q, (snap) => {
       setMmi(snap.docs.map((d) => ({ id: d.id, type: 'mmi', ...d.data() })))
       setMmiLoaded(true)
@@ -65,7 +69,7 @@ export default function RecentActivity() {
 
   useEffect(() => {
     if (!user || !schoolId) return
-    const q = query(collection(db, 'coco_reports'), where('teacherUid', '==', user.uid), where('schoolId', '==', schoolId))
+    const q = query(collection(db, 'coco_reports'), where('teacherUid', '==', user.uid), where('schoolId', '==', schoolId), where('tarikh', 'in', RECENT_DAYS))
     return onSnapshot(q, (snap) => {
       setCoco(snap.docs.map((d) => ({ id: d.id, type: 'coco', ...d.data() })))
       setCocoLoaded(true)
@@ -79,30 +83,37 @@ export default function RecentActivity() {
   }, [erph, mmi, coco])
 
   return (
-    <div className="content-card activity-sidebar">
-      <h3 className="card-heading">{t('home.myActivity')}</h3>
+    <section className="content-card sheet">
+      <h2 className="card-heading">{t('home.myActivity')}</h2>
       {loading ? (
         <ListSkeleton rows={4} />
       ) : recentActivity.length === 0 ? (
-        <p className="muted">{t('home.myActivityEmpty')}</p>
+        <p className="empty-line">{t('home.myActivityEmpty')}</p>
       ) : (
-        <div className="activity-list activity-list-compact">
+        <ul className="line-list">
           {recentActivity.map((item) => {
             const meta = activityMeta[item.type]
             const detail = item.type === 'erph' ? item.tajuk : item.type === 'mmi' ? `${item.matapelajaran} · ${item.tingkatan} ${item.kelas}` : `${item.kategori} · ${item.namaUnit}`
             const to = item.type === 'coco' ? COCO_CATEGORY_ROUTES[item.kategori] || meta.to : meta.to
             return (
-              <Link to={to} key={`${item.type}-${item.id}`} className="activity-row">
-                <span className={`activity-dot ${meta.color}`} />
-                <div className="activity-row-text">
-                  <strong>{meta.label}</strong>
-                  <span>{formatDateLabel(item.tarikh, locale)} &middot; {detail}</span>
-                </div>
-              </Link>
+              <li key={`${item.type}-${item.id}`}>
+                <Link to={to} className="line-row">
+                  <span className={`line-icon tone-${meta.tone}`}>
+                    <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                      <path d={TILE_ICONS[meta.icon]} />
+                    </svg>
+                  </span>
+                  <span className="line-text">
+                    <strong>{meta.label}</strong>
+                    <span>{detail}</span>
+                  </span>
+                  <time className="line-meta">{formatDateLabel(item.tarikh, locale)}</time>
+                </Link>
+              </li>
             )
           })}
-        </div>
+        </ul>
       )}
-    </div>
+    </section>
   )
 }

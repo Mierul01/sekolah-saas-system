@@ -459,7 +459,28 @@ tbody tr.row-status-pending:hover { background: rgba(224,70,63,.08); }
 .snapshot-warn { border-top-color: var(--gold-500); }
 
 /* ---------- Teacher dashboard layout ---------- */
-.teacher-dash-layout { display: grid; grid-template-columns: 1fr 280px; gap: 20px; }
+.teacher-dash-layout { display: grid; grid-template-columns: 1.5fr 1fr; gap: 14px; align-items: start; }
+.teacher-dash-layout .module-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px; }
+.module-launch {
+  --solid: var(--blue-solid); --soft: var(--blue-soft); --edge: var(--blue-edge);
+  display: flex; align-items: flex-start; gap: 11px; padding: 12px 14px; border-radius: var(--radius-sm);
+  background: var(--soft); border: 1px solid var(--edge); transition: border-color .15s ease, box-shadow .15s ease, transform .15s ease;
+}
+.module-launch:hover { border-color: var(--solid); box-shadow: var(--shadow-sm); }
+.module-launch:active { transform: scale(.99); }
+.module-launch-text { min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.module-launch-text strong { font-size: 13px; color: var(--navy-900); font-weight: 600; }
+.module-launch-text span { font-size: 11.5px; color: #475467; line-height: 1.4; }
+.status-pill-idle { background: var(--navy-soft); color: #475467; }
+.btn-line {
+  flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center; min-width: 72px; min-height: 34px;
+  padding: 6px 12px; border-radius: 8px; font-size: 12.5px; font-weight: 600;
+  border: 1px solid var(--line); background: #fff; color: var(--navy-900); transition: background .15s ease, border-color .15s ease;
+}
+.btn-line:hover { background: var(--bg); border-color: #cdd5e2; }
+.btn-line:active { background: #e6ebf3; }
+.btn-line-primary { background: var(--navy-900); border-color: var(--navy-900); color: #fff; }
+.btn-line-primary:hover { background: var(--navy-700); border-color: var(--navy-700); }
 .teacher-dash-side { display: flex; flex-direction: column; }
 .teacher-dash-side .content-card { margin-bottom: 0; }
 .activity-sidebar { display: flex; flex-direction: column; flex: 1; }
@@ -1060,7 +1081,18 @@ a.line-row:hover .line-chevron { color: var(--navy-900); }
   .form-row { grid-template-columns: 1fr; }
 }
 
+@media (max-width: 960px) {
+  .teacher-dash-layout { grid-template-columns: 1fr; }
+}
+
 @media (max-width: 780px) {
+  :root { --band-h: 168px; }
+  .page-content { padding: 16px 16px 24px; }
+  .tile-row { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .tile { padding: 12px 14px; }
+  .tile-spark { width: 56px; }
+  .tile-value { font-size: 22px; }
+  .line-meta { display: none; }
   .sidebar {
     position: fixed; z-index: 100; left: 0; top: 0;
     transform: translateX(-100%); transition: transform .25s ease;
