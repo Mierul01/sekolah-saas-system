@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts'
 import { collection, onSnapshot, query, where, db } from '../../lib/db'
+import StatTile, { dailyCounts } from '../../components/StatTile'
 import { useAuth } from '../../context/AuthContext'
 import { useLanguage } from '../../context/LanguageContext'
 import { todayStr, formatDateLabel } from '../../lib/constants'
@@ -66,10 +67,11 @@ export default function MMIDashboard() {
 
   const recordsForDate = useMemo(() => allRecords.filter((r) => r.tarikh === date), [allRecords, date])
 
-  const uniqueTeachersToday = useMemo(
-    () => new Set(recordsForDate.map((r) => r.teacherUid)).size,
-    [recordsForDate]
-  )
+  // Only teacher accounts count, so filled + not filled always equals the teacher total.
+  const uniqueTeachersToday = useMemo(() => {
+    const teacherIds = new Set(teachers.map((tc) => tc.id))
+    return new Set(recordsForDate.map((r) => r.teacherUid).filter((id) => teacherIds.has(id))).size
+  }, [recordsForDate, teachers])
 
   const avgAttendance = useMemo(() => {
     if (!recordsForDate.length) return 0
@@ -129,6 +131,11 @@ export default function MMIDashboard() {
   )
 
   const notFilledCount = teachers.length - uniqueTeachersToday
+  // Last 7 days ending today: sessions per day and average students per session.
+  const sessionTrend = useMemo(() => dailyCounts(allRecords, 7, locale), [allRecords, locale])
+  const attendanceTrend = useMemo(() => dailyCounts(allRecords, 7, locale, (rows) =>
+    rows.length ? Math.round(rows.reduce((sum, r) => sum + (r.kehadiranPelajar || 0), 0) / rows.length) : 0
+  ), [allRecords, locale])
 
   function applyFilters() {
     setDate(draftDate)
@@ -143,17 +150,23 @@ export default function MMIDashboard() {
         <p>{t('mmi.dashDesc')}</p>
       </div>
 
-      <div className="stat-row">
-        <div className="stat-card"><span>{teachers.length}</span><label>{t('mmi.totalTeachers')}</label></div>
-        <div className="stat-card stat-good"><span>{uniqueTeachersToday}</span><label>{t('mmi.filledToday')}</label></div>
-        <div className="stat-card stat-bad"><span>{notFilledCount}</span><label>{t('mmi.notFilledToday')}</label></div>
-        <div className="stat-card"><span>{recordsForDate.length}</span><label>{t('mmi.sessionsRecorded')}</label></div>
-        <div className="stat-card"><span>{avgAttendance}</span><label>{t('mmi.avgAttendance')}</label></div>
+      <div className="tile-row">
+        <StatTile tone="navy" icon="users" label={t('mmi.totalTeachers')} value={teachers.length} bar={1} />
+        <StatTile
+          tone="green" icon="check" label={t('mmi.filledToday')} value={uniqueTeachersToday}
+          suffix={`/${teachers.length}`} bar={teachers.length ? uniqueTeachersToday / teachers.length : 0}
+        />
+        <StatTile
+          tone="red" icon="alert" label={t('mmi.notFilledToday')} value={notFilledCount}
+          bar={teachers.length ? notFilledCount / teachers.length : 0}
+        />
+        <StatTile tone="gold" icon="clock" label={t('mmi.sessionsRecorded')} value={recordsForDate.length} spark={sessionTrend} />
+        <StatTile tone="teal" icon="student" label={t('mmi.avgAttendance')} value={avgAttendance} spark={attendanceTrend} />
       </div>
 
       <div className="content-card">
         <h3 className="card-heading">{t('mmi.bySubject')} ({formatDateLabel(date)})</h3>
-        <ResponsiveContainer width="100%" height={260}>
+        <ResponsiveContainer width="100%" height={220}>
           <BarChart data={bySubject} layout="vertical" margin={{ left: 40 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="#e6e9f0" />
             <XAxis type="number" fontSize={12} allowDecimals={false} />

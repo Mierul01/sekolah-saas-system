@@ -8,12 +8,14 @@ import SearchableSelect from '../../components/SearchableSelect'
 import { TableSkeleton } from '../../components/Skeleton'
 import ExportButtons from '../../components/ExportButtons'
 import DatePicker from '../../components/DatePicker'
+import StatTile, { dailyCounts } from '../../components/StatTile'
 import Pagination, { DEFAULT_PAGE_SIZE, PageSizeSelect } from '../../components/Pagination'
 
 export default function CocoDashboard() {
   const { profile } = useAuth()
   const schoolId = profile?.schoolId
-  const { t } = useLanguage()
+  const { t, language } = useLanguage()
+  const tileLocale = language === 'en' ? 'en-MY' : 'ms-MY'
   // Draft values follow the controls as the user changes them; the applied
   // values are what the dashboard actually shows, and only catch up when the
   // Filter button is clicked.
@@ -85,6 +87,12 @@ export default function CocoDashboard() {
     [filteredRecords, safePage, pageSize]
   )
 
+  // Last 7 days ending today: reports per day and students involved per day.
+  const reportTrend = useMemo(() => dailyCounts(allRecords, 7, tileLocale), [allRecords, tileLocale])
+  const studentTrend = useMemo(() => dailyCounts(allRecords, 7, tileLocale, (rows) =>
+    rows.reduce((sum, r) => sum + (Number(r.kehadiranPelajar) || 0), 0)
+  ), [allRecords, tileLocale])
+
   const byCategory = useMemo(() => {
     return COCO_CATEGORIES.map((cat) => ({
       name: cat,
@@ -106,10 +114,13 @@ export default function CocoDashboard() {
         <p>{t('coco.dashDesc')}</p>
       </div>
 
-      <div className="stat-row">
-        <div className="stat-card"><span>{recordsForDate.length}</span><label>{t('coco.totalReports')}</label></div>
-        <div className="stat-card stat-good"><span>{totalStudents}</span><label>{t('coco.studentsInvolved')}</label></div>
-        <div className="stat-card stat-bad"><span>{notAttended}</span><label>{t('coco.advisorsAbsent')}</label></div>
+      <div className="tile-row">
+        <StatTile tone="teal" icon="award" label={t('coco.totalReports')} value={recordsForDate.length} spark={reportTrend} />
+        <StatTile tone="green" icon="student" label={t('coco.studentsInvolved')} value={totalStudents} spark={studentTrend} />
+        <StatTile
+          tone="red" icon="alert" label={t('coco.advisorsAbsent')} value={notAttended}
+          suffix={`/${recordsForDate.length}`} bar={recordsForDate.length ? notAttended / recordsForDate.length : 0}
+        />
       </div>
 
       <div className="content-card">

@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts'
 import { collection, onSnapshot, query, where, db } from '../../lib/db'
+import StatTile from '../../components/StatTile'
 import { useAuth } from '../../context/AuthContext'
 import { useLanguage } from '../../context/LanguageContext'
 import { todayStr, formatDateLabel, toLocalISODate } from '../../lib/constants'
@@ -63,10 +64,11 @@ export default function ERPHDashboard() {
     [allRecords, date]
   )
 
-  const submittedUids = useMemo(
-    () => new Set(recordsForDate.map((r) => r.teacherUid)),
-    [recordsForDate]
-  )
+  // Only teacher accounts count, so submitted + not submitted always equals the teacher total.
+  const submittedUids = useMemo(() => {
+    const teacherIds = new Set(teachers.map((tc) => tc.id))
+    return new Set(recordsForDate.map((r) => r.teacherUid).filter((id) => teacherIds.has(id)))
+  }, [recordsForDate, teachers])
 
   const notSubmitted = useMemo(
     () => teachers.filter((tc) => !submittedUids.has(tc.id)),
@@ -123,16 +125,25 @@ export default function ERPHDashboard() {
         <p>{t('erph.dashDesc')}</p>
       </div>
 
-      <div className="stat-row">
-        <div className="stat-card"><span>{teachers.length}</span><label>{t('erph.totalTeachers')}</label></div>
-        <div className="stat-card stat-good"><span>{submittedUids.size}</span><label>{t('erph.submitted')}</label></div>
-        <div className="stat-card stat-bad"><span>{notSubmitted.length}</span><label>{t('erph.notSubmitted')}</label></div>
-        <div className="stat-card"><span>{complianceRate}%</span><label>{t('erph.complianceRate')}</label></div>
+      <div className="tile-row">
+        <StatTile tone="navy" icon="users" label={t('erph.totalTeachers')} value={teachers.length} bar={1} />
+        <StatTile
+          tone="green" icon="check" label={t('erph.submitted')} value={submittedUids.size}
+          suffix={`/${teachers.length}`} bar={teachers.length ? submittedUids.size / teachers.length : 0}
+        />
+        <StatTile
+          tone="red" icon="alert" label={t('erph.notSubmitted')} value={notSubmitted.length}
+          bar={teachers.length ? notSubmitted.length / teachers.length : 0}
+        />
+        <StatTile
+          tone="blue" icon="percent" label={t('erph.complianceRate')} value={complianceRate} suffix="%"
+          spark={chartData.map((d) => ({ label: d.date, value: d.jumlah }))}
+        />
       </div>
 
       <div className="content-card">
         <h3 className="card-heading">{t('erph.trend7')}</h3>
-        <ResponsiveContainer width="100%" height={240}>
+        <ResponsiveContainer width="100%" height={210}>
           <BarChart data={chartData}>
             <CartesianGrid strokeDasharray="3 3" stroke="#e6e9f0" />
             <XAxis dataKey="date" fontSize={12} />

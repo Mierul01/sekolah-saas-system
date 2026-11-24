@@ -7,6 +7,10 @@ import { ASSEMBLY_STATUSES, todayStr, formatDateLabel } from '../../lib/constant
 import ConfirmModal from '../../components/ConfirmModal'
 import { TableSkeleton } from '../../components/Skeleton'
 import ExportButtons from '../../components/ExportButtons'
+import StatTile from '../../components/StatTile'
+
+// Same colours the status emoji in ASSEMBLY_STATUSES stand for.
+const STATUS_TONES = { HADIR: 'green', BERTUGAS: 'gold', KURSUS_TUGAS_RASMI: 'blue', CUTI_MC: 'red' }
 
 function generateCode() {
   return String(Math.floor(1000 + Math.random() * 9000))
@@ -103,11 +107,18 @@ export default function AssemblyAdmin() {
         )}
       </div>
 
-      <div className="stat-row">
-        <div className="stat-card"><span>{teachers.length}</span><label>{t('assembly.totalStaff')}</label></div>
-        <div className="stat-card stat-good"><span>{checkins.length}</span><label>{t('assembly.checkedIn')}</label></div>
+      <div className="tile-row">
+        <StatTile tone="navy" icon="users" label={t('assembly.totalStaff')} value={teachers.length} bar={1} />
+        <StatTile
+          tone="purple" icon="flag" label={t('assembly.checkedIn')} value={checkins.length}
+          suffix={`/${teachers.length}`} bar={teachers.length ? checkins.length / teachers.length : 0}
+        />
         {ASSEMBLY_STATUSES.map((s) => (
-          <div className="stat-card" key={s.value}><span>{statusCounts[s.value]}</span><label>{s.label}</label></div>
+          <StatTile
+            key={s.value} tone={STATUS_TONES[s.value] || 'blue'} icon={s.value === 'CUTI_MC' ? 'alert' : 'check'}
+            label={s.label.replace(/^\S+\s+/, '')} value={statusCounts[s.value]}
+            bar={checkins.length ? statusCounts[s.value] / checkins.length : 0}
+          />
         ))}
       </div>
 
