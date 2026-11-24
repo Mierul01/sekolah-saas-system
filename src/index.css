@@ -59,6 +59,8 @@ input, select, textarea { font-family: inherit; }
 a { color: inherit; text-decoration: none; }
 ::selection { background: rgba(37,99,201,.2); }
 :focus-visible { outline: 2px solid var(--blue-500); outline-offset: 2px; }
+/* Blue focus ring disappears on navy, so dark surfaces use gold. */
+.sidebar :focus-visible, .topbar-app :focus-visible { outline-color: var(--gold-400); }
 
 /* ---------- App shell ---------- */
 .app-shell { display: flex; min-height: 100vh; }
