@@ -1,153 +1,125 @@
-// Landing page text in both languages. Everything here describes what the
-// system really does for each group at the school; there are no usage figures.
-// Staff positions match JAWATAN_LIST (Pengetua, PK, Guru Kanan, Guru, AKP).
+// Landing page text in both languages (the original landing layout).
+// Every figure describes the system itself: 7 modules, 2 roles. There are no
+// usage numbers, and the 3 steps are the real way staff use it.
 
 const ms = {
-  navPeople: 'Warga Sekolah', navModules: 'Modul', navDay: 'Hari Persekolahan', navHelp: 'Bantuan',
+  navFeatures: 'Ciri-ciri', navModules: 'Modul', navHow: 'Cara Berfungsi',
   login: 'Log Masuk', menu: 'Menu', closeMenu: 'Tutup menu',
-
-  heroTitle: 'Satu sistem untuk seluruh warga sekolah',
-  heroLead: 'Pentadbir, guru dan staf {school} merekod urusan harian di satu tempat: e-RPH, kehadiran kelas, perhimpunan, kokurikulum, jadual waktu dan maklumat pelajar.',
-  heroLogin: 'Log Masuk ke Sistem',
-  heroSeeModules: 'Lihat modul',
-  heroNote: 'Gunakan e-mel rasmi sekolah anda.',
-  scrollMore: 'Lihat lagi',
-  shotAlt: 'Papan pemuka pentadbir SchoolManage: jubin hari ini, carta e-RPH 7 hari dan senarai guru yang belum hantar',
-  shotCaption: 'Papan pemuka pentadbir (tangkapan skrin dengan data ujian)',
-
-  peopleTitle: 'Warga sekolah',
-  peopleDesc: 'Setiap kumpulan nampak dan buat perkara yang berbeza dalam sistem.',
-  people: [
-    {
-      key: 'admin', title: 'Pentadbir', who: 'Pengetua, Penolong Kanan dan Guru Kanan',
-      items: ['Pantau penghantaran e-RPH dan check-in kelas setiap hari', 'Jana kod perhimpunan dan lihat senarai kehadiran', 'Urus maklumat pelajar ikut tingkatan dan kelas'],
-    },
-    {
-      key: 'teacher', title: 'Guru', who: 'Guru mata pelajaran, guru kelas dan guru penasihat',
-      items: ['Hantar e-RPH selepas mengajar', 'Check-in MMI bagi setiap sesi di kelas', 'Hantar laporan kokurikulum bersama gambar'],
-    },
-    {
-      key: 'staff', title: 'Staf sokongan', who: 'Anggota Kumpulan Pelaksana (AKP) dan staf lain',
-      items: ['Check-in perhimpunan dengan kod harian', 'Rekod jawatan dan status kehadiran'],
-    },
-    {
-      key: 'student', title: 'Pelajar', who: 'Tingkatan 1 hingga 5',
-      items: ['Tidak perlu log masuk', 'Rekod pelajar, kehadiran di kelas dan penglibatan kokurikulum disimpan oleh guru'],
-    },
+  kicker: 'Sistem Sekolah Bersepadu',
+  heroTitle: 'Satu Sistem, Semua Urusan Sekolah',
+  heroBody: 'Gantikan Google Form, Looker Studio dan folder Drive yang berselerak dengan satu sistem untuk e-RPH, kehadiran, kokurikulum, kurikulum dan maklumat pelajar, siap dengan papan pemuka masa nyata untuk pentadbir.',
+  loginNow: 'Log Masuk Sekarang', viewModules: 'Lihat Semua Modul',
+  stats: [
+    { value: '7', label: 'Modul bersepadu' },
+    { value: '2', label: 'Peranan: Guru & Pentadbir' },
+    { value: 'Masa nyata', label: 'Papan pemuka' },
   ],
+  shotAlt: 'Papan pemuka pentadbir SchoolManage: jubin hari ini, carta e-RPH 7 hari dan senarai guru yang belum hantar',
+  shotCaption: 'Paparan sebenar sistem, dengan data ujian',
+  floatNotifTitle: 'Notifikasi baharu',
+  floatNotifBody: 'e-RPH baharu telah dihantar',
+  floatCodeTitle: 'Kod perhimpunan hari ini',
+  floatCodeNote: 'Ditukar setiap hari',
 
-  modulesTitle: 'Modul dalam sistem',
-  modulesDesc: 'Disusun sama seperti menu di dalam sistem.',
-  groupDaily: 'Rekod harian', groupSchool: 'Sekolah',
-  usedBy: 'Digunakan oleh',
+  featuresEyebrow: 'Ciri-ciri', featuresTitle: 'Direka Untuk Cara Sekolah Sebenar Beroperasi',
+  featuresDesc: 'Setiap modul dibina berdasarkan borang dan proses yang sedia digunakan oleh sekolah, cuma lebih kemas dan tersusun.',
+  f1Title: 'Log Masuk Selamat', f1Desc: 'Google Sign-In terhad kepada domain e-mel rasmi sekolah. Tiada kata laluan baharu untuk diingati.',
+  f1Field: 'nama@sekolah.edu.my',
+  f2Title: 'Papan Pemuka Masa Nyata', f2Desc: 'Pentadbir nampak status penghantaran, kehadiran dan laporan tanpa menunggu e-mel atau memuat turun spreadsheet.',
+  f2Chart: 'e-RPH, 7 hari lepas',
+  f3Title: 'Kawalan Peranan', f3Desc: 'Guru dan pentadbir melihat paparan yang berbeza secara automatik. Tiada siapa boleh jadikan diri sendiri pentadbir.',
+  f4Title: 'Boleh Berkembang', f4Desc: 'Bermula dengan modul asas dan tambah modul baharu tanpa mengganggu data sedia ada.',
+  f4Planned: 'Tahfiz (dirancang)',
+
+  modulesEyebrow: 'Modul', modulesTitle: 'Satu Sistem, Semua Urusan Harian',
+  modulesDesc: 'Semua yang diperlukan oleh guru dan pentadbir, dalam satu tempat.',
   roleTeacher: 'Guru', roleAdmin: 'Pentadbir', roleStaff: 'Semua staf',
   modules: [
-    { key: 'erph', group: 'daily', title: 'e-RPH', desc: 'Rekod Pengajaran Harian, dengan senarai guru yang belum hantar untuk pentadbir.', roles: ['teacher', 'admin'] },
-    { key: 'mmi', group: 'daily', title: 'Check-in Kelas (MMI)', desc: 'Subjek, kelas, masa dan bilangan pelajar hadir bagi setiap sesi.', roles: ['teacher', 'admin'] },
-    { key: 'assembly', group: 'daily', title: 'Perhimpunan', desc: 'Check-in dengan kod harian, jawatan dan status kehadiran.', roles: ['staff', 'admin'] },
-    { key: 'coco', group: 'school', title: 'Kokurikulum', desc: 'Badan beruniform, kelab, sukan dan rumah sukan: kehadiran dan laporan perjumpaan.', roles: ['teacher', 'admin'] },
-    { key: 'timetable', group: 'school', title: 'Jadual Waktu', desc: 'Jadual ikut kelas dan ikut guru, dengan amaran pertindihan slot.', roles: ['teacher', 'admin'] },
-    { key: 'curriculum', group: 'school', title: 'Unit Kurikulum', desc: 'Folder e-panitia setiap mata pelajaran, tersusun ikut jabatan.', roles: ['teacher', 'admin'] },
-    { key: 'students', group: 'school', title: 'Maklumat Pelajar', desc: 'Rekod pelajar yang boleh dicari dan ditapis ikut kelas.', roles: ['admin'] },
+    { key: 'erph', title: 'e-RPH', desc: 'Penghantaran dan pemantauan Rekod Pengajaran Harian setiap guru.', roles: ['teacher', 'admin'] },
+    { key: 'mmi', title: 'Check-in Kelas (MMI)', desc: 'Rekod keberadaan guru dalam bilik darjah bagi setiap sesi.', roles: ['teacher', 'admin'] },
+    { key: 'assembly', title: 'Kehadiran Perhimpunan', desc: 'Check-in pantas dengan kod harian semasa perhimpunan rasmi.', roles: ['staff', 'admin'] },
+    { key: 'coco', title: 'Kokurikulum', desc: 'Laporan perjumpaan kelab, badan beruniform, sukan dan rumah sukan, serta rekod kehadiran.', roles: ['teacher', 'admin'] },
+    { key: 'curriculum', title: 'Unit Kurikulum', desc: 'Pautan e-folder panitia mata pelajaran tersusun mengikut jabatan.', roles: ['teacher', 'admin'] },
+    { key: 'students', title: 'Maklumat Pelajar', desc: 'Pangkalan data pelajar yang boleh dicari dan ditapis ikut kelas.', roles: ['admin'] },
+    { key: 'timetable', title: 'Jadual Waktu', desc: 'Jadual mengajar setiap guru dengan pengesanan pertindihan slot dan eksport PDF/Excel.', roles: ['teacher', 'admin'] },
   ],
 
-  dayTitle: 'Hari persekolahan',
-  dayDesc: 'Bagaimana sistem digunakan dari pagi hingga petang.',
-  dayCaption: 'Penggunaan sistem sepanjang hari persekolahan',
-  colWhen: 'Masa', colWhat: 'Urusan', colWho: 'Siapa',
-  day: [
-    { when: 'Pagi', what: 'Perhimpunan: pentadbir jana kod, warga sekolah check-in dengan jawatan dan status.', who: 'Semua staf' },
-    { when: 'Waktu kelas', what: 'Check-in MMI bagi setiap sesi mengajar.', who: 'Guru' },
-    { when: 'Selepas mengajar', what: 'Hantar e-RPH. Pentadbir terus nampak siapa yang belum.', who: 'Guru, Pentadbir' },
-    { when: 'Petang', what: 'Kehadiran dan laporan kokurikulum bersama gambar aktiviti.', who: 'Guru penasihat' },
-    { when: 'Bila-bila masa', what: 'Papan pemuka, jadual waktu dan eksport Excel atau PDF untuk mesyuarat.', who: 'Pentadbir' },
+  howEyebrow: 'Cara Berfungsi', howTitle: 'Begini Sistem Digunakan Setiap Hari',
+  steps: [
+    { title: 'Log masuk dengan e-mel sekolah', desc: 'Guru dan staf log masuk dengan akaun rasmi sekolah. Peranan pentadbir diluluskan oleh pihak sekolah.' },
+    { title: 'Rekod urusan harian', desc: 'Hantar e-RPH, check-in kelas dan perhimpunan, dan laporan kokurikulum dari telefon atau komputer.' },
+    { title: 'Pentadbir pantau serta-merta', desc: 'Papan pemuka menunjukkan siapa sudah dan belum hantar, dengan eksport Excel atau PDF.' },
   ],
+  stepPreview: ['Log Masuk', 'Hantar e-RPH', 'Belum hantar'],
 
-  helpTitle: 'Bantuan',
-  helpDesc: 'Soalan yang biasa ditanya oleh warga sekolah.',
-  helpMore: 'Sokongan & pemadaman data',
-  privacy: 'Notis Privasi (PDPA)', terms: 'Terma Perkhidmatan',
-
-  ctaTitle: 'Log masuk dengan akaun sekolah anda',
-  ctaDesc: 'Belum ada akaun atau perlukan peranan pentadbir? Hubungi Unit ICT atau pentadbiran sekolah.',
-  footerTagline: 'Sistem pengurusan operasi harian sekolah.',
+  ctaTitle: 'Sedia Untuk Mula Hari Ini?',
+  ctaDesc: 'Log masuk dengan akaun sekolah anda. Belum ada akaun? Hubungi Unit ICT atau pentadbiran sekolah.',
+  ctaSupport: 'Hubungi Sokongan',
+  footerTagline: 'Sistem pengurusan operasi harian sekolah dalam satu platform.',
+  footerProduct: 'Produk', footerLegal: 'Legal',
+  privacy: 'Dasar Privasi (PDPA)', terms: 'Terma Perkhidmatan', support: 'Sokongan & Pemadaman Data',
   rights: 'Hak cipta terpelihara.',
 }
 
 const en = {
-  navPeople: 'School Community', navModules: 'Modules', navDay: 'School Day', navHelp: 'Help',
+  navFeatures: 'Features', navModules: 'Modules', navHow: 'How It Works',
   login: 'Log In', menu: 'Menu', closeMenu: 'Close menu',
-
-  heroTitle: 'One system for the whole school community',
-  heroLead: 'Administrators, teachers and staff at {school} record daily work in one place: e-RPH, class attendance, assembly, co-curriculum, timetable and student records.',
-  heroLogin: 'Log In to the System',
-  heroSeeModules: 'See the modules',
-  heroNote: 'Use your official school email.',
-  scrollMore: 'See more',
-  shotAlt: 'SchoolManage admin dashboard: today tiles, a 7-day e-RPH chart and the list of teachers yet to submit',
-  shotCaption: 'Admin dashboard (screenshot with test data)',
-
-  peopleTitle: 'The school community',
-  peopleDesc: 'Each group sees and does different things in the system.',
-  people: [
-    {
-      key: 'admin', title: 'Administrators', who: 'Principal, Senior Assistants and Senior Teachers',
-      items: ['Track e-RPH submissions and class check-ins every day', 'Generate the assembly code and see who checked in', 'Manage student records by form and class'],
-    },
-    {
-      key: 'teacher', title: 'Teachers', who: 'Subject teachers, class teachers and advisors',
-      items: ['Submit e-RPH after teaching', 'Check in to MMI for every class session', 'File co-curriculum reports with photos'],
-    },
-    {
-      key: 'staff', title: 'Support staff', who: 'AKP and other staff',
-      items: ["Check in to assembly with the day's code", 'Record position and attendance status'],
-    },
-    {
-      key: 'student', title: 'Students', who: 'Form 1 to Form 5',
-      items: ['No login needed', 'Student records, class attendance and co-curriculum involvement are kept by teachers'],
-    },
+  kicker: 'Integrated School System',
+  heroTitle: 'One System, All School Matters',
+  heroBody: 'Replace scattered Google Forms, Looker Studio and Drive folders with one system for e-RPH, attendance, co-curriculum, curriculum and student records, complete with a real-time dashboard for admins.',
+  loginNow: 'Log In Now', viewModules: 'View All Modules',
+  stats: [
+    { value: '7', label: 'Integrated modules' },
+    { value: '2', label: 'Roles: Teacher & Admin' },
+    { value: 'Real-time', label: 'Dashboard' },
   ],
+  shotAlt: 'SchoolManage admin dashboard: today tiles, a 7-day e-RPH chart and the list of teachers yet to submit',
+  shotCaption: 'The real system, with test data',
+  floatNotifTitle: 'New notification',
+  floatNotifBody: 'A new e-RPH has been submitted',
+  floatCodeTitle: "Today's assembly code",
+  floatCodeNote: 'Changes every day',
 
-  modulesTitle: 'Modules in the system',
-  modulesDesc: 'Grouped the same way as the menu inside the system.',
-  groupDaily: 'Daily records', groupSchool: 'School',
-  usedBy: 'Used by',
+  featuresEyebrow: 'Features', featuresTitle: 'Built for How Schools Actually Operate',
+  featuresDesc: 'Every module is built around the forms and processes schools already use, just tidier and better organised.',
+  f1Title: 'Secure Sign-In', f1Desc: "Google Sign-In restricted to the school's official email domain. No new passwords to remember.",
+  f1Field: 'name@school.edu.my',
+  f2Title: 'Real-Time Dashboard', f2Desc: 'Admins see submission status, attendance and reports without waiting for emails or downloading spreadsheets.',
+  f2Chart: 'e-RPH, last 7 days',
+  f3Title: 'Role-Based Access', f3Desc: 'Teachers and admins automatically see different views. Nobody can make themselves an admin.',
+  f4Title: 'Built to Grow', f4Desc: 'Start with the core modules and add new ones without disrupting existing data.',
+  f4Planned: 'Tahfiz (planned)',
+
+  modulesEyebrow: 'Modules', modulesTitle: 'One System, All Daily Matters',
+  modulesDesc: 'Everything teachers and admins need, in one place.',
   roleTeacher: 'Teachers', roleAdmin: 'Admins', roleStaff: 'All staff',
   modules: [
-    { key: 'erph', group: 'daily', title: 'e-RPH', desc: 'Daily lesson records, with a list of teachers yet to submit for admins.', roles: ['teacher', 'admin'] },
-    { key: 'mmi', group: 'daily', title: 'Class Check-in (MMI)', desc: 'Subject, class, time and number of students present for each session.', roles: ['teacher', 'admin'] },
-    { key: 'assembly', group: 'daily', title: 'Assembly', desc: 'Check in with the daily code, position and attendance status.', roles: ['staff', 'admin'] },
-    { key: 'coco', group: 'school', title: 'Co-curriculum', desc: 'Uniformed bodies, clubs, sports and sports houses: attendance and meeting reports.', roles: ['teacher', 'admin'] },
-    { key: 'timetable', group: 'school', title: 'Timetable', desc: 'By class and by teacher, with slot clash warnings.', roles: ['teacher', 'admin'] },
-    { key: 'curriculum', group: 'school', title: 'Curriculum Unit', desc: "Each subject panel's e-folder, grouped by department.", roles: ['teacher', 'admin'] },
-    { key: 'students', group: 'school', title: 'Student Records', desc: 'Student records you can search and filter by class.', roles: ['admin'] },
+    { key: 'erph', title: 'e-RPH', desc: "Submission and monitoring of every teacher's daily lesson record.", roles: ['teacher', 'admin'] },
+    { key: 'mmi', title: 'Class Check-in (MMI)', desc: "Record of teachers' classroom presence for every session.", roles: ['teacher', 'admin'] },
+    { key: 'assembly', title: 'Assembly Attendance', desc: 'Fast check-in with a daily code during official assemblies.', roles: ['staff', 'admin'] },
+    { key: 'coco', title: 'Co-curriculum', desc: 'Meeting reports for clubs, uniformed bodies, sports and sports houses, plus attendance records.', roles: ['teacher', 'admin'] },
+    { key: 'curriculum', title: 'Curriculum Unit', desc: 'Subject panel e-folder links organised by department.', roles: ['teacher', 'admin'] },
+    { key: 'students', title: 'Student Records', desc: 'A searchable student database, filterable by class.', roles: ['admin'] },
+    { key: 'timetable', title: 'Timetable', desc: "Every teacher's teaching schedule with clash detection and PDF/Excel export.", roles: ['teacher', 'admin'] },
   ],
 
-  dayTitle: 'The school day',
-  dayDesc: 'How the system is used from morning to afternoon.',
-  dayCaption: 'System use across the school day',
-  colWhen: 'When', colWhat: 'Task', colWho: 'Who',
-  day: [
-    { when: 'Morning', what: 'Assembly: admins generate the code, the school community checks in with position and status.', who: 'All staff' },
-    { when: 'Class time', what: 'MMI check-in for every teaching session.', who: 'Teachers' },
-    { when: 'After teaching', what: "Submit e-RPH. Admins see straight away who hasn't.", who: 'Teachers, Admins' },
-    { when: 'Afternoon', what: 'Co-curriculum attendance and reports with activity photos.', who: 'Advisor teachers' },
-    { when: 'Any time', what: 'Dashboards, timetables and Excel or PDF exports for meetings.', who: 'Admins' },
+  howEyebrow: 'How It Works', howTitle: 'How the System Is Used Every Day',
+  steps: [
+    { title: 'Log in with your school email', desc: 'Teachers and staff sign in with their official school account. The admin role is approved by the school.' },
+    { title: 'Record daily work', desc: 'Submit e-RPH, class and assembly check-ins, and co-curriculum reports from a phone or computer.' },
+    { title: 'Admins monitor straight away', desc: "The dashboard shows who has and hasn't submitted, with Excel or PDF export." },
   ],
+  stepPreview: ['Log In', 'Submit e-RPH', 'Not yet'],
 
-  helpTitle: 'Help',
-  helpDesc: 'Questions the school community often asks.',
-  helpMore: 'Support & data deletion',
-  privacy: 'Privacy Notice (PDPA)', terms: 'Terms of Service',
-
-  ctaTitle: 'Log in with your school account',
-  ctaDesc: 'No account yet, or need the admin role? Contact the ICT Unit or the school office.',
-  footerTagline: "The school's daily operations system.",
+  ctaTitle: 'Ready to Start Today?',
+  ctaDesc: 'Log in with your school account. No account yet? Contact the ICT Unit or the school office.',
+  ctaSupport: 'Contact Support',
+  footerTagline: "The school's daily operations system, in one platform.",
+  footerProduct: 'Product', footerLegal: 'Legal',
+  privacy: 'Privacy Policy (PDPA)', terms: 'Terms of Service', support: 'Support & Data Deletion',
   rights: 'All rights reserved.',
 }
 
-export function getLandingCopy(language, school) {
-  const dict = language === 'en' ? en : ms
-  const fill = (s) => s.replaceAll('{school}', school)
-  return { ...dict, heroLead: fill(dict.heroLead) }
+export function getLandingCopy(language) {
+  return language === 'en' ? en : ms
 }
