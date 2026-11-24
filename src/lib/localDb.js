@@ -4,16 +4,25 @@
 // onSnapshot, query, where, orderBy, serverTimestamp) so pages don't need to
 // know which backend they're talking to — see lib/db.js.
 
+import { DEFAULT_SCHOOL_ID } from './constants'
+
 const store = new Map()
 const listeners = new Map()
 let idCounter = 0
+
+// Local mode only ever holds one school, but every dashboard filters by
+// schoolId. Records written without one (the sample data, older saves) are
+// treated as belonging to that school so they still show up.
+function withSchool(record) {
+  return record && record.schoolId == null ? { ...record, schoolId: DEFAULT_SCHOOL_ID } : record
+}
 
 function loadCollection(name) {
   if (store.has(name)) return store.get(name)
   let arr = []
   try {
     const raw = localStorage.getItem(`ldb:${name}`)
-    arr = raw ? JSON.parse(raw) : []
+    arr = raw ? JSON.parse(raw).map(withSchool) : []
   } catch {
     arr = []
   }
@@ -98,7 +107,7 @@ function resolveRecords(ref) {
 export async function addDoc(collRef, data) {
   const arr = loadCollection(collRef.name)
   const id = genId()
-  arr.push({ id, ...data })
+  arr.push(withSchool({ id, ...data }))
   saveCollection(collRef.name)
   return { id }
 }
@@ -107,11 +116,11 @@ export async function setDoc(docRef, data, opts = {}) {
   const arr = loadCollection(docRef.name)
   const idx = arr.findIndex((r) => r.id === docRef.id)
   if (idx === -1) {
-    arr.push({ id: docRef.id, ...data })
+    arr.push(withSchool({ id: docRef.id, ...data }))
   } else if (opts.merge) {
-    arr[idx] = { ...arr[idx], ...data }
+    arr[idx] = withSchool({ ...arr[idx], ...data })
   } else {
-    arr[idx] = { id: docRef.id, ...data }
+    arr[idx] = withSchool({ id: docRef.id, ...data })
   }
   saveCollection(docRef.name)
 }
