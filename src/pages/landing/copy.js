@@ -11,6 +11,7 @@ const ms = {
   heroLogin: 'Log Masuk ke Sistem',
   heroSeeModules: 'Lihat modul',
   heroNote: 'Gunakan e-mel rasmi sekolah anda.',
+  scrollMore: 'Lihat lagi',
   shotAlt: 'Papan pemuka pentadbir SchoolManage: jubin hari ini, carta e-RPH 7 hari dan senarai guru yang belum hantar',
   shotCaption: 'Papan pemuka pentadbir (tangkapan skrin dengan data ujian)',
 
@@ -82,6 +83,7 @@ const en = {
   heroLogin: 'Log In to the System',
   heroSeeModules: 'See the modules',
   heroNote: 'Use your official school email.',
+  scrollMore: 'See more',
   shotAlt: 'SchoolManage admin dashboard: today tiles, a 7-day e-RPH chart and the list of teachers yet to submit',
   shotCaption: 'Admin dashboard (screenshot with test data)',
 

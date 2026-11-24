@@ -14,6 +14,8 @@
 .lp { min-height: 100vh; background: var(--bg); color: var(--ink-700); overflow-x: clip; font-size: 14.5px; }
 .lp a { color: inherit; }
 .lp .lp-wrap { width: min(1140px, 100% - 32px); margin-inline: auto; }
+/* Big monitors: a wider column so the first screen is not a small island in navy. */
+@media (min-width: 1600px) { .lp .lp-wrap { width: min(1320px, 100% - 96px); } }
 .lp .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
 .lp-nav :focus-visible, .lp-hero :focus-visible, .lp-cta :focus-visible, .lp-foot :focus-visible { outline-color: var(--gold-400); }
 
@@ -55,7 +57,21 @@
 .lp-sheet .lp-btn { margin-top: 6px; }
 
 /* Hero on the navy band, like the header band inside the system */
-.lp-hero { position: relative; padding: 40px 0 36px; background: var(--navy-800); }
+/* The first screen is the hero alone: it fills the window below the header,
+   content centred, with a link down to the rest of the page. */
+.lp-hero {
+  position: relative; background: var(--navy-800);
+  min-height: calc(100svh - 65px); padding: 40px 0 64px;
+  display: flex; flex-direction: column; justify-content: center;
+}
+.lp .lp-scroll {
+  position: absolute; left: 50%; bottom: 18px; transform: translateX(-50%);
+  display: inline-flex; flex-direction: column; align-items: center; gap: 2px;
+  min-height: 44px; padding: 4px 12px; border-radius: 8px;
+  font-size: 12.5px; font-weight: 600; color: rgba(255,255,255,.72); text-decoration: none;
+  transition: color .15s, background .15s;
+}
+.lp .lp-scroll:hover { color: #fff; background: rgba(255,255,255,.08); }
 .lp-hero-in { display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); gap: 36px; align-items: center; }
 .lp-hero-copy { color: rgba(255,255,255,.78); }
 .lp-date {
@@ -68,8 +84,8 @@
 }
 .lp-date span { font-size: 12px; line-height: 1.35; color: rgba(255,255,255,.85); }
 .lp-date b { display: block; color: #fff; font-weight: 600; }
-.lp-hero h1 { color: #fff; font-size: clamp(28px, 3.4vw, 40px); line-height: 1.18; letter-spacing: -.015em; margin: 0; }
-.lp-lead { margin: 14px 0 0; font-size: 15px; line-height: 1.65; max-width: 34em; }
+.lp-hero h1 { color: #fff; font-size: clamp(28px, 3.3vw, 54px); line-height: 1.18; letter-spacing: -.015em; margin: 0; text-wrap: balance; }
+.lp-lead { margin: 14px 0 0; font-size: clamp(15px, 1.05vw, 18px); line-height: 1.65; max-width: 34em; }
 .lp-cta-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
 .lp-note { margin: 12px 0 0; font-size: 12.5px; color: rgba(255,255,255,.6); }
 .lp-shot { margin: 6px 0 0; }
@@ -142,7 +158,7 @@
   .lp-menu-btn { display: inline-grid; }
 }
 @media (max-width: 600px) {
-  .lp-hero { padding-top: 26px; }
+  .lp-hero { padding-top: 26px; justify-content: flex-start; }
 
   .lp-cta-row .lp-btn { flex: 1 1 100%; }
   .lp .lp-people { grid-template-columns: minmax(0, 1fr); }

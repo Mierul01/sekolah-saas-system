@@ -129,6 +129,10 @@ export default function Landing() {
               <figcaption>{c.shotCaption}</figcaption>
             </figure>
           </div>
+          <a href="#warga" className="lp-scroll">
+            <span>{c.scrollMore}</span>
+            <Icon path="M6 9l6 6 6-6" size={18} />
+          </a>
         </section>
 
         <section className="lp-section" id="warga">
