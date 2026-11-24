@@ -1188,5 +1188,5 @@ a.line-row:hover .line-chevron { color: var(--navy-900); }
 .landing-brand { display: flex; align-items: center; gap: 10px; }
 .landing-brand strong { font-family: var(--font-head); font-size: 17px; color: var(--navy-900); }
 
-/* Shown for a moment while the landing page loads; same navy as its background. */
-.lp-fallback { min-height: 100vh; background: #0a1428; }
+/* Shown for a moment while the landing page loads; same colour as its background. */
+.lp-fallback { min-height: 100vh; background: #fbfaf6; }
