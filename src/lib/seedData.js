@@ -242,6 +242,49 @@ function isDemoFullClass(r) {
 // teacher's own timetable — built from these same slots — reads as a real,
 // coherent week. Only touches cells that are still empty, so it's safe to
 // call on every mount.
+// One full test class (local test mode only) so the student list has enough
+// rows to test paging, search and filters: Maklumat Pelajar, filter
+// TINGKATAN 1 + HAFS, then Tapis. Names are made-up combinations.
+export const TEST_CLASS = { tingkatan: 'TINGKATAN 1', kelas: 'HAFS', size: 50 }
+const TEST_CLASS_FLAG = 'ldb_test_class_v1'
+const TEST_FIRST_BOYS = ['Muhammad Aqil', 'Ahmad Irfan', 'Adam Rayyan', 'Muhammad Harith', 'Aiman Hakimi', 'Danish Iskandar', 'Haris Zafran', 'Luqman Hakim', 'Muhammad Ilham', 'Syahmi Afiq', 'Firdaus Amsyar', 'Izzat Daniel', 'Naufal Rizqi']
+const TEST_FIRST_GIRLS = ['Nur Aisyah', 'Siti Humaira', 'Nur Damia', 'Alya Maisarah', 'Nurul Iman', 'Sofea Qaisara', 'Hana Insyirah', 'Nur Batrisya', 'Aina Safiyya', 'Irdina Zahra', 'Puteri Balqis', 'Nur Qistina']
+const TEST_FATHERS = ['Ismail', 'Hamzah', 'Rashid', 'Zakaria', 'Kamarul', 'Azlan', 'Mohd Nor', 'Sulaiman', 'Hisham', 'Fauzi', 'Rahman', 'Yusof', 'Shahrul', 'Hairul', 'Nizam', 'Ridzuan', 'Zulkifli']
+
+let testClassInFlight = false
+
+export async function ensureTestClass() {
+  if (testClassInFlight || localStorage.getItem(TEST_CLASS_FLAG) === '1') return
+  testClassInFlight = true
+  try {
+    localStorage.setItem(TEST_CLASS_FLAG, '1')
+    const snap = await getDocs(query(
+      collection(db, 'students'),
+      where('tingkatan', '==', TEST_CLASS.tingkatan),
+      where('kelas', '==', TEST_CLASS.kelas)
+    ))
+    for (let i = snap.docs.length; i < TEST_CLASS.size; i++) {
+      const boy = i % 2 === 0
+      const first = boy ? TEST_FIRST_BOYS[(i / 2) % TEST_FIRST_BOYS.length | 0] : TEST_FIRST_GIRLS[((i - 1) / 2) % TEST_FIRST_GIRLS.length | 0]
+      const father = TEST_FATHERS[(i * 7) % TEST_FATHERS.length]
+      const month = String((i % 12) + 1).padStart(2, '0')
+      const day = String((i % 27) + 1).padStart(2, '0')
+      await addDoc(collection(db, 'students'), {
+        namaPenuh: `${first} ${boy ? 'bin' : 'binti'} ${father}`,
+        noKP: `13${month}${day}-01-${String(5000 + i * 37).slice(-4)}`,
+        tingkatan: TEST_CLASS.tingkatan,
+        kelas: TEST_CLASS.kelas,
+        jantina: boy ? 'Lelaki' : 'Perempuan',
+        namaPenjaga: `${father} bin ${TEST_FATHERS[(i * 3 + 5) % TEST_FATHERS.length]}`,
+        noTelefonPenjaga: `01${(i % 9) + 1}-${String(2000000 + i * 4111).slice(-7)}`,
+        createdAt: new Date().toISOString(),
+      })
+    }
+  } finally {
+    testClassInFlight = false
+  }
+}
+
 export async function ensureFullClassTimetable() {
   if (fullTimetableInFlight.has('full')) return
   fullTimetableInFlight.add('full')

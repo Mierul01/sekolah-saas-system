@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext'
 import { useLanguage } from '../context/LanguageContext'
 import { SCHOOL_NAME, firebaseReady } from '../lib/firebase'
 import { collection, getDocs, db } from '../lib/db'
-import { seedSampleData, ensurePersonalRecords, ensureTimetableData, ensureFullClassTimetable } from '../lib/seedData'
+import { seedSampleData, ensurePersonalRecords, ensureTimetableData, ensureFullClassTimetable, ensureTestClass } from '../lib/seedData'
 import AccountMenu from './AccountMenu'
 import BrandMark from './BrandMark'
 import LanguageSwitcher from './LanguageSwitcher'
@@ -225,7 +225,10 @@ export default function Layout() {
       await ensurePersonalRecords(me)
       await ensureTimetableData(me)
       await ensureFullClassTimetable()
-    })()
+      await ensureTestClass()
+    })().catch((err) => {
+      console.error('Local sample data could not be prepared:', err)
+    })
   }, [user, profile])
 
   useEffect(() => {
