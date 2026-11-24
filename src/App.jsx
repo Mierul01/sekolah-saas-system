@@ -1,10 +1,13 @@
+import { lazy, Suspense } from 'react'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { AuthProvider } from './context/AuthContext'
 import { LanguageProvider } from './context/LanguageContext'
 import { NotificationProvider } from './context/NotificationContext'
 import { ProtectedRoute } from './components/ProtectedRoute'
 import Layout from './components/Layout'
-import Landing from './pages/Landing'
+// The landing page carries the animation library; loading it on its own keeps
+// it out of the download for teachers who go straight into the system.
+const Landing = lazy(() => import('./pages/Landing'))
 import Login from './pages/Login'
 import Home from './pages/Home'
 import SubmitERPH from './pages/erph/SubmitERPH'
@@ -35,7 +38,7 @@ export default function App() {
       <AuthProvider>
       <NotificationProvider>
         <Routes>
-          <Route path="/" element={<Landing />} />
+          <Route path="/" element={<Suspense fallback={<div className="lp-fallback" />}><Landing /></Suspense>} />
           <Route path="/login" element={<Login />} />
           <Route path="/pdpa" element={<PDPA />} />
           <Route path="/terms" element={<Terms />} />
