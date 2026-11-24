@@ -28,13 +28,6 @@ setup: submit e-RPH, log an MMI check-in, generate an assembly code and check in
 
 - Sign in as different names to simulate different teachers (each name gets its own local
   account); pick "Pentadbir" as the role to see the admin dashboards.
-- Ready-made test logins (local test mode only, never in Firebase):
-
-  | Role | Email | Password |
-  | --- | --- | --- |
-  | Pentadbir (admin) | `admin.ujian@smkatokbachok.edu.my` | `Ujian123` |
-  | Guru (teacher) | `faizal.demo@smkatokbachok.edu.my` (also `nurul.demo`, `hafiz.demo`, `aina.demo`, `farid.demo`, `balqis.demo`, `syafiq.demo`, `aisyah.demo` at the same domain) | `Demo123` |
-
 - To test a long list, open **Maklumat Pelajar**, filter **TINGKATAN 1** + **HAFS** and press
   **Tapis**: that test class has 50 students.
 - To run test mode while a real `.env` exists, start Vite with blank Firebase keys, e.g. a
