@@ -312,7 +312,8 @@ export default function Layout() {
           <NotificationBell />
           <LanguageSwitcher className="lang-switch-light" />
         </header>
-        <main className="page-content">
+        {/* Keyed by path so the enter animation replays on every page change. */}
+        <main className="page-content" key={location.pathname}>
           <Outlet />
         </main>
       </div>

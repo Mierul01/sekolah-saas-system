@@ -812,6 +812,54 @@ tbody tr:last-child td { border-bottom: none; }
 .tile-skeleton { background: #fff; border-color: var(--line); }
 @media (prefers-reduced-motion: reduce) { .tile-bar span { transition: none; } }
 
+/* ---------- Page enter motion ----------
+   Purpose: show that a new page has opened and lead the eye top to bottom
+   (title, then figures, then detail). Short (under 0.5s), runs once per
+   page, never loops. The header band itself never animates (it would
+   flash); only the text on it does. */
+@keyframes rise-in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+@keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes bar-grow { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+@keyframes spark-grow { from { transform: scaleY(0); } to { transform: scaleY(1); } }
+
+.page-content > * > .page-head > *,
+.page-content > * > .dash-hero > * { animation: rise-in .32s var(--ease) backwards; }
+.page-content > * > .page-head > :nth-child(2),
+.page-content > * > .dash-hero > :nth-child(2) { animation-delay: .05s; }
+
+.page-content > * > :not(.page-head):not(.dash-hero) { animation: rise-in .38s var(--ease) backwards; animation-delay: .08s; }
+.page-content > * > :not(.page-head):not(.dash-hero):nth-child(3) { animation-delay: .14s; }
+.page-content > * > :not(.page-head):not(.dash-hero):nth-child(4) { animation-delay: .2s; }
+.page-content > * > :not(.page-head):not(.dash-hero):nth-child(n+5) { animation-delay: .26s; }
+
+/* Figures: tiles arrive one after another, bars fill, mini charts grow. */
+.tile-row > .tile { animation: rise-in .36s var(--ease) backwards; }
+.tile-row > .tile:nth-child(2) { animation-delay: .05s; }
+.tile-row > .tile:nth-child(3) { animation-delay: .1s; }
+.tile-row > .tile:nth-child(4) { animation-delay: .15s; }
+.tile-row > .tile:nth-child(n+5) { animation-delay: .2s; }
+.tile-bar span { transform-origin: left center; animation: bar-grow .7s var(--ease) .25s backwards; }
+.tile-spark span { transform-origin: bottom center; animation: spark-grow .45s var(--ease) backwards; }
+.tile-spark span:nth-child(1) { animation-delay: .2s; }
+.tile-spark span:nth-child(2) { animation-delay: .24s; }
+.tile-spark span:nth-child(3) { animation-delay: .28s; }
+.tile-spark span:nth-child(4) { animation-delay: .32s; }
+.tile-spark span:nth-child(5) { animation-delay: .36s; }
+.tile-spark span:nth-child(6) { animation-delay: .4s; }
+.tile-spark span:nth-child(7) { animation-delay: .44s; }
+
+/* Lists and the sidebar submenu fade in so new rows don't just pop. */
+.line-list > li { animation: fade-in .3s ease backwards; }
+.line-list > li:nth-child(2) { animation-delay: .04s; }
+.line-list > li:nth-child(3) { animation-delay: .08s; }
+.line-list > li:nth-child(4) { animation-delay: .12s; }
+.line-list > li:nth-child(n+5) { animation-delay: .16s; }
+.sidebar-submenu { animation: rise-in .2s var(--ease) backwards; }
+
+@media (prefers-reduced-motion: reduce) {
+  .page-content *, .sidebar-submenu, .tile-bar span, .tile-spark span { animation: none !important; }
+}
+
 /* ---------- Chips ---------- */
 .chip-list { display: flex; flex-wrap: wrap; gap: 8px; }
 

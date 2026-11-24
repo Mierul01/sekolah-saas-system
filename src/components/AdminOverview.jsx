@@ -10,6 +10,7 @@ import StatTile from './StatTile'
 import { TILE_ICONS, dailyCounts, lastDays } from '../lib/tiles'
 
 const RECENT_LIMIT = 6
+const REDUCED_MOTION = typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
 const NOT_SUBMITTED_LIMIT = 6
 
 function getTime(ts) {
@@ -201,7 +202,7 @@ export default function AdminOverview() {
                     cursor={{ fill: 'rgba(37,99,201,.06)' }}
                     formatter={(v) => [`${v}/${total} ${t('adminOverview.chartTeachers')}`, 'e-RPH']}
                   />
-                  <Bar dataKey="value" radius={[5, 5, 0, 0]} maxBarSize={34} isAnimationActive={false}>
+                  <Bar dataKey="value" radius={[5, 5, 0, 0]} maxBarSize={34} isAnimationActive={!REDUCED_MOTION} animationDuration={600}>
                     {erphTrend.map((d) => <Cell key={d.iso} fill={d.iso === today ? '#2563c9' : '#9dbbea'} />)}
                   </Bar>
                 </BarChart>
