@@ -1,14 +1,14 @@
-// Short navy "wipe" between the public pages (landing, login) and into the
-// system: a panel with the logo covers the screen, the route changes under
-// it, then it lifts away. Lives on <body> so it survives the route change.
-// Skipped entirely under "reduce motion".
+// Quiet page transition between the public pages (landing, login) and into
+// the system: the screen fades to navy with the logo in the centre, the route
+// changes underneath, then it fades into the new page. Lives on <body> so it
+// survives the route change. Skipped entirely under "reduce motion".
 
-const COVER_MS = 420
-const REVEAL_MS = 460
+const COVER_MS = 240
+const REVEAL_MS = 340
 let running = false
 
 // The app icon (same drawing as BrandMark), served from public/icons.
-const LOGO_IMG = '<img src="/icons/icon.svg" width="72" height="72" alt="">'
+const LOGO_IMG = '<img src="/icons/icon.svg" width="64" height="64" alt="">'
 
 export function playPageWipe(navigate, to, options) {
   const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches

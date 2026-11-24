@@ -1057,20 +1057,21 @@ a.line-row:hover .line-chevron { color: var(--navy-900); }
 .login-form-panel-inner > .auth-pane { animation: auth-in-left .36s var(--ease) backwards; }
 .login-form-panel-inner > .auth-pane-register { animation-name: auth-in-right; }
 
-/* Page wipe between the public pages and into the system (lib/pageTransition.js) */
+/* Page transition between the public pages and into the system
+   (lib/pageTransition.js): a quick fade to navy with the logo in the centre,
+   then a fade into the next page. Kept short and quiet on purpose. */
 .page-wipe {
   position: fixed; inset: 0; z-index: 1000; display: grid; place-items: center; pointer-events: all;
-  background: linear-gradient(160deg, var(--navy-900), var(--navy-800) 55%, var(--blue-600));
-  transform: translateY(100%); transition: transform .42s cubic-bezier(.76, 0, .24, 1);
+  background: var(--navy-900); opacity: 0; transition: opacity .22s ease;
 }
-.page-wipe.is-covering { transform: translateY(0); }
-.page-wipe.is-leaving { transform: translateY(-100%); transition-duration: .46s; }
+.page-wipe.is-covering { opacity: 1; }
+.page-wipe.is-leaving { opacity: 0; transition-duration: .32s; }
 .page-wipe-mark {
-  display: block; width: 72px; height: 72px; border-radius: 23%;
-  box-shadow: 0 14px 34px -10px rgba(0,0,0,.6);
-  transform: scale(.7); opacity: 0; transition: transform .35s var(--ease) .1s, opacity .25s ease .1s;
+  display: block; width: 64px; height: 64px; border-radius: 22%;
+  box-shadow: 0 0 0 1.5px rgba(255, 255, 255, .22);
+  transform: scale(.92); transition: transform .4s var(--ease);
 }
-.page-wipe.is-covering .page-wipe-mark { transform: scale(1); opacity: 1; }
+.page-wipe.is-covering .page-wipe-mark { transform: scale(1); }
 
 @media (prefers-reduced-motion: reduce) {
   .auth-tabs::before, .page-wipe { transition: none; }
