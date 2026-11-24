@@ -55,7 +55,10 @@ export default function Home() {
         </div>
         <div className="dash-hero-date">
           <strong>{now.getDate()}</strong>
-          <span>{now.toLocaleDateString(locale, { month: 'short', year: 'numeric' })}</span>
+          <span>
+            <b>{now.toLocaleDateString(locale, { weekday: 'long' })}</b>
+            {now.toLocaleDateString(locale, { month: 'long', year: 'numeric' })}
+          </span>
         </div>
       </div>
 

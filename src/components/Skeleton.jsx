@@ -34,12 +34,12 @@ export function ListSkeleton({ rows = 4 }) {
 
 export function StatRowSkeleton({ count = 4 }) {
   return (
-    <div className="stat-row">
+    <div className="tile-row" aria-busy="true">
       {Array.from({ length: count }).map((_, i) => (
-        <div className="stat-card" key={i}>
-          <span className="skeleton skeleton-circle" style={{ margin: '0 auto 10px' }} />
-          <span className="skeleton skeleton-text" style={{ width: '40%', height: 20, margin: '0 auto 8px' }} />
-          <span className="skeleton skeleton-text" style={{ width: '70%', margin: '0 auto' }} />
+        <div className="tile tile-skeleton" key={i}>
+          <span className="skeleton skeleton-circle" style={{ width: 30, height: 30 }} />
+          <span className="skeleton skeleton-text" style={{ width: '45%', height: 22 }} />
+          <span className="skeleton skeleton-text" style={{ width: '75%' }} />
         </div>
       ))}
     </div>

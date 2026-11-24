@@ -80,6 +80,7 @@ function matches(record, { field, op, value }) {
     case '>=': return v >= value
     case '<': return v < value
     case '<=': return v <= value
+    case 'in': return Array.isArray(value) && value.includes(v)
     default: return true
   }
 }

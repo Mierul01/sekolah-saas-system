@@ -9,14 +9,17 @@ import AccountMenu from './AccountMenu'
 import BrandMark from './BrandMark'
 import LanguageSwitcher from './LanguageSwitcher'
 import NotificationBell from './NotificationBell'
+import SidebarToday from './SidebarToday'
 
 const SEED_FLAG = 'ldb_sample_seeded'
+const NAV_SECTIONS = ['main', 'daily', 'school', 'links']
 
 function getNavStructure(t) {
   return [
-    { type: 'link', to: '/app', label: t('nav.dashboard'), icon: 'grid', end: true },
+    { type: 'link', to: '/app', label: t('nav.dashboard'), icon: 'grid', end: true, section: 'main' },
     {
       type: 'group',
+      section: 'daily',
       key: 'erph',
       label: t('nav.erph'),
       icon: 'doc',
@@ -27,6 +30,7 @@ function getNavStructure(t) {
     },
     {
       type: 'group',
+      section: 'daily',
       key: 'mmi',
       label: t('nav.mmi'),
       icon: 'clock',
@@ -37,6 +41,7 @@ function getNavStructure(t) {
     },
     {
       type: 'group',
+      section: 'daily',
       key: 'perhimpunan',
       label: t('nav.perhimpunan'),
       icon: 'flag',
@@ -47,6 +52,7 @@ function getNavStructure(t) {
     },
     {
       type: 'group',
+      section: 'school',
       key: 'kokurikulum',
       label: t('nav.kokurikulum'),
       icon: 'award',
@@ -59,9 +65,10 @@ function getNavStructure(t) {
         { to: '/app/kokurikulum/dashboard', label: t('nav.kokurikulumDashboard'), adminOnly: true },
       ],
     },
-    { type: 'link', to: '/app/kurikulum', label: t('nav.kurikulum'), icon: 'book' },
+    { type: 'link', to: '/app/kurikulum', label: t('nav.kurikulum'), icon: 'book', section: 'school' },
     {
       type: 'group',
+      section: 'school',
       key: 'jadual',
       label: t('nav.jadual'),
       icon: 'calendar',
@@ -70,9 +77,10 @@ function getNavStructure(t) {
         { to: '/app/jadual/guru', label: t('timetable.viewTeacher') },
       ],
     },
-    { type: 'link', to: '/app/pelajar', label: t('nav.pelajar'), icon: 'users', adminOnly: true },
+    { type: 'link', to: '/app/pelajar', label: t('nav.pelajar'), icon: 'users', adminOnly: true, section: 'school' },
     {
       type: 'group',
+      section: 'links',
       key: 'externalLinks',
       label: t('nav.externalLinks'),
       icon: 'externalLink',
@@ -190,6 +198,15 @@ export default function Layout() {
   const location = useLocation()
   const navStructure = getNavStructure(t)
   const pageMeta = getPageMeta(location.pathname, navStructure, t)
+  const sectionLabels = { daily: t('nav.sectionDaily'), school: t('nav.sectionSchool'), links: t('nav.sectionLinks') }
+
+  // Escape closes the phone menu sheet, like the overlay tap does.
+  useEffect(() => {
+    if (!navOpen) return
+    const onKey = (e) => { if (e.key === 'Escape') setNavOpen(false) }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [navOpen])
 
   // Runs once per session as soon as any /app/* page mounts — not just the
   // dashboard — so sample/self-healing data is in place no matter which page
@@ -230,29 +247,41 @@ export default function Layout() {
           </div>
         </div>
         <nav className="sidebar-nav">
-          {navStructure.filter((item) => item.type === 'link' ? (!item.adminOnly || isAdmin) : true).map((item) =>
-            item.type === 'group' ? (
-              <NavGroup
-                key={item.key}
-                group={item}
-                isAdmin={isAdmin}
-                openKey={openKey}
-                setOpenKey={setOpenKey}
-                onNavigate={() => setNavOpen(false)}
-              />
-            ) : (
-              <NavLink
-                key={item.to}
-                to={item.to}
-                end={item.end}
-                className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}
-                onClick={() => setNavOpen(false)}
-              >
-                <Icon name={item.icon} />
-                <span className="sidebar-link-label">{item.label}</span>
-              </NavLink>
+          {NAV_SECTIONS.map((section) => {
+            const items = navStructure.filter(
+              (item) => item.section === section && (item.type === 'link' ? !item.adminOnly || isAdmin : true)
             )
-          )}
+            if (items.length === 0) return null
+            return (
+              <div className="sidebar-section" key={section}>
+                {section !== 'main' && <h2 className="sidebar-section-label">{sectionLabels[section]}</h2>}
+                {items.map((item) =>
+                  item.type === 'group' ? (
+                    <NavGroup
+                      key={item.key}
+                      group={item}
+                      isAdmin={isAdmin}
+                      openKey={openKey}
+                      setOpenKey={setOpenKey}
+                      onNavigate={() => setNavOpen(false)}
+                    />
+                  ) : (
+                    <NavLink
+                      key={item.to}
+                      to={item.to}
+                      end={item.end}
+                      className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}
+                      onClick={() => setNavOpen(false)}
+                    >
+                      <Icon name={item.icon} />
+                      <span className="sidebar-link-label">{item.label}</span>
+                    </NavLink>
+                  )
+                )}
+              </div>
+            )
+          })}
+          <SidebarToday onNavigate={() => setNavOpen(false)} />
         </nav>
 
         <AccountMenu />
@@ -262,7 +291,7 @@ export default function Layout() {
 
       <div className="main-col">
         <header className="topbar-app">
-          <button className="menu-btn" onClick={() => setNavOpen(true)} aria-label="Buka menu">
+          <button className="menu-btn" onClick={() => setNavOpen(true)} aria-label="Buka menu" aria-expanded={navOpen}>
             <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M4 6h16M4 12h16M4 18h16" strokeLinecap="round" />
             </svg>
@@ -278,7 +307,7 @@ export default function Layout() {
           </div>
           <div className="topbar-spacer" />
           <NotificationBell />
-          <LanguageSwitcher />
+          <LanguageSwitcher className="lang-switch-light" />
         </header>
         <main className="page-content">
           <Outlet />
