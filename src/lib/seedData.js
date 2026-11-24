@@ -57,6 +57,36 @@ const DEMO_TEACHERS = [
   { name: 'Cikgu Wan Aisyah', email: 'aisyah.demo@smkatokbachok.edu.my' },
 ]
 
+// Ready-made logins for local test mode (listed in README). They exist only
+// in the browser's localStorage, never in Firebase.
+const DEMO_TEACHER_PASSWORD = 'Demo123'
+const TEST_ADMIN = { name: 'Pentadbir Ujian', email: 'admin.ujian@smkatokbachok.edu.my', password: 'Ujian123', role: 'admin' }
+
+// Creates the test admin and demo teacher accounts if missing, so the login
+// form works in a fresh browser before anyone has registered.
+export async function ensureTestAccounts() {
+  const snap = await getDocs(collection(db, 'users'))
+  const emails = new Set(snap.docs.map((d) => d.data().email?.trim().toLowerCase()))
+  const accounts = [
+    TEST_ADMIN,
+    ...DEMO_TEACHERS.map((t) => ({ ...t, password: DEMO_TEACHER_PASSWORD, role: 'guru' })),
+  ]
+  for (const a of accounts) {
+    if (emails.has(a.email)) continue
+    await setDoc(doc(db, 'users', slugFromEmail(a.email)), {
+      name: a.name,
+      email: a.email,
+      phone: '',
+      password: a.password,
+      photoURL: '',
+      role: a.role,
+      pdpaConsent: true,
+      pdpaConsentAt: new Date().toISOString(),
+      createdAt: new Date().toISOString(),
+    })
+  }
+}
+
 const DEMO_STUDENTS = [
   { namaPenuh: 'Ahmad Danish bin Rosli', noKP: '120304-03-1234', tingkatan: 'TINGKATAN 1', kelas: 'QALUN', jantina: 'Lelaki', namaPenjaga: 'Rosli bin Ismail', noTelefonPenjaga: '019-2345671' },
   { namaPenuh: 'Nur Alisya binti Zulkarnain', noKP: '120512-03-5678', tingkatan: 'TINGKATAN 1', kelas: 'WARSH', jantina: 'Perempuan', namaPenjaga: 'Zulkarnain bin Hassan', noTelefonPenjaga: '013-8765432' },
@@ -377,7 +407,7 @@ export async function seedSampleData() {
       name: t.name,
       email: t.email,
       phone: '',
-      password: 'Demo123',
+      password: DEMO_TEACHER_PASSWORD,
       photoURL: '',
       role: 'guru',
       pdpaConsent: true,

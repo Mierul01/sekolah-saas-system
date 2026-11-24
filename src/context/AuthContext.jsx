@@ -14,6 +14,7 @@ import { doc, getDoc, getDocs, setDoc, deleteDoc, collection, onSnapshot, server
 import { auth, googleProvider, ALLOWED_EMAIL_DOMAIN, DEVELOPER_EMAIL, firebaseReady } from '../lib/firebase'
 import { getSessionUid, setSessionUid, subscribeSession, slugify } from '../lib/localAuth'
 import { DEFAULT_SCHOOL_ID } from '../lib/constants'
+import { ensureTestAccounts } from '../lib/seedData'
 
 const AuthContext = createContext(null)
 
@@ -201,6 +202,7 @@ export function AuthProvider({ children }) {
 
   async function loginLocal(email, password, remember = true) {
     setError('')
+    await ensureTestAccounts()
     const target = email.trim().toLowerCase()
     const snap = await getDocs(collection(db, 'users'))
     const match = snap.docs.find((d) => d.data().email?.trim().toLowerCase() === target)
