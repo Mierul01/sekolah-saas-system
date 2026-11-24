@@ -3,10 +3,8 @@
 // Staff positions match JAWATAN_LIST (Pengetua, PK, Guru Kanan, Guru, AKP).
 
 const ms = {
-  portal: 'Portal sistem pengurusan sekolah',
   navPeople: 'Warga Sekolah', navModules: 'Modul', navDay: 'Hari Persekolahan', navHelp: 'Bantuan',
   login: 'Log Masuk', menu: 'Menu', closeMenu: 'Tutup menu',
-  themeLight: 'Tukar ke mod cerah', themeDark: 'Tukar ke mod gelap',
 
   heroTitle: 'Satu sistem untuk seluruh warga sekolah',
   heroLead: 'Pentadbir, guru dan staf {school} merekod urusan harian di satu tempat: e-RPH, kehadiran kelas, perhimpunan, kokurikulum, jadual waktu dan maklumat pelajar.',
@@ -76,10 +74,8 @@ const ms = {
 }
 
 const en = {
-  portal: 'School management system portal',
   navPeople: 'School Community', navModules: 'Modules', navDay: 'School Day', navHelp: 'Help',
   login: 'Log In', menu: 'Menu', closeMenu: 'Close menu',
-  themeLight: 'Switch to light mode', themeDark: 'Switch to dark mode',
 
   heroTitle: 'One system for the whole school community',
   heroLead: 'Administrators, teachers and staff at {school} record daily work in one place: e-RPH, class attendance, assembly, co-curriculum, timetable and student records.',

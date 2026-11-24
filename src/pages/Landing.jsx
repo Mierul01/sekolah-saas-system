@@ -8,17 +8,15 @@ import Reveal from '../components/Reveal'
 import { getLandingCopy } from './landing/copy'
 import './landing/landing.css'
 
-// v2: the earlier dark-first design saved 'dark' for everyone who visited it.
-const THEME_KEY = 'sm-landing-theme-v2'
-const FONTS_ID = 'lp-fonts'
-const FONTS_HREF = 'https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,600;8..60,700&display=swap'
+// The landing page is built from the system's own parts (navy band, coloured
+// tiles, line lists, table and FAQ styles) so it reads as the front door of
+// the same product, not a separate website.
 
-// One icon per group of people at the school.
-const PEOPLE_ICONS = {
-  admin: 'M3 21h18M5 21V9l7-5 7 5v12M10 21v-5h4v5M9 11h.01M15 11h.01',
-  teacher: 'M3 4h18v11H3zM7 8h7M7 11h4M8 21l4-6 4 6',
-  staff: 'M5 3h14v18H5zM9 3v3h6V3M12 13a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM8 18c.7-1.6 2.3-2.5 4-2.5s3.3.9 4 2.5',
-  student: 'M12 3L2 8l10 5 10-5-10-5zM6 10.6V16c0 1.66 2.69 3 6 3s6-1.34 6-3v-5.4M22 8v6',
+const PEOPLE_LOOK = {
+  admin: { tone: 'navy', icon: 'M3 21h18M5 21V9l7-5 7 5v12M10 21v-5h4v5M9 11h.01M15 11h.01' },
+  teacher: { tone: 'blue', icon: 'M3 4h18v11H3zM7 8h7M7 11h4M8 21l4-6 4 6' },
+  staff: { tone: 'teal', icon: 'M5 3h14v18H5zM9 3v3h6V3M12 13a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM8 18c.7-1.6 2.3-2.5 4-2.5s3.3.9 4 2.5' },
+  student: { tone: 'gold', icon: 'M12 3L2 8l10 5 10-5-10-5zM6 10.6V16c0 1.66 2.69 3 6 3s6-1.34 6-3v-5.4M22 8v6' },
 }
 
 // Same colour and icon each module has inside the system.
@@ -32,9 +30,9 @@ const MODULE_LOOK = {
   students: { tone: 'green', icon: 'M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2M9 11a4 4 0 100-8 4 4 0 000 8zM23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75' },
 }
 
-function Icon({ path, size = 20 }) {
+function Icon({ path, size = 18 }) {
   return (
-    <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       <path d={path} />
     </svg>
   )
@@ -43,44 +41,21 @@ function Icon({ path, size = 20 }) {
 function FaqItem({ q, a }) {
   const [open, setOpen] = useState(false)
   return (
-    <div className="lp-faq-item">
-      <button type="button" className="lp-faq-q" onClick={() => setOpen((o) => !o)} aria-expanded={open}>
+    <div className="faq-item">
+      <button type="button" className="faq-question" onClick={() => setOpen((o) => !o)} aria-expanded={open}>
         <span>{q}</span>
-        <span className={`lp-faq-chev ${open ? 'is-open' : ''}`}><Icon path="M6 9l6 6 6-6" size={18} /></span>
+        <span className={`faq-chevron ${open ? 'is-open' : ''}`}><Icon path="M6 9l6 6 6-6" size={16} /></span>
       </button>
-      {open && <p className="lp-faq-a">{a}</p>}
+      {open && <p className="faq-answer">{a}</p>}
     </div>
   )
-}
-
-function getInitialTheme() {
-  try {
-    const saved = localStorage.getItem(THEME_KEY)
-    if (saved === 'light' || saved === 'dark') return saved
-  } catch { /* storage blocked */ }
-  return 'light'
 }
 
 export default function Landing() {
   const { t, language } = useLanguage()
   const c = getLandingCopy(language, SCHOOL_NAME)
   const locale = language === 'en' ? 'en-MY' : 'ms-MY'
-  const [theme, setTheme] = useState(getInitialTheme)
   const [menuOpen, setMenuOpen] = useState(false)
-
-  useEffect(() => {
-    try { localStorage.setItem(THEME_KEY, theme) } catch { /* storage blocked */ }
-  }, [theme])
-
-  // The serif heading font is only used here, so it loads with this page.
-  useEffect(() => {
-    if (document.getElementById(FONTS_ID)) return
-    const link = document.createElement('link')
-    link.id = FONTS_ID
-    link.rel = 'stylesheet'
-    link.href = FONTS_HREF
-    document.head.appendChild(link)
-  }, [])
 
   useEffect(() => {
     if (!menuOpen) return
@@ -97,62 +72,55 @@ export default function Landing() {
   ]
   const roleLabel = { teacher: c.roleTeacher, admin: c.roleAdmin, staff: c.roleStaff }
   const faqs = [1, 2, 3].map((n) => ({ q: t(`help.q${n}`), a: t(`help.a${n}`) }))
-  const today = new Date().toLocaleDateString(locale, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
-  const nextTheme = theme === 'dark' ? 'light' : 'dark'
+  const now = new Date()
 
   return (
-    <div className="lp" data-theme={theme}>
-      <div className="lp-strip">
-        <div className="wrap lp-strip-in">
-          <span>{c.portal} · <strong>{SCHOOL_NAME}</strong></span>
-          <span className="lp-strip-date">{today}</span>
-        </div>
-      </div>
-
+    <div className="lp">
       <header className="lp-nav">
-        <div className="wrap lp-nav-in">
+        <div className="lp-wrap lp-nav-in">
           <a href="#top" className="lp-brand">
             <BrandMark />
             <span>
-              <strong>{PRODUCT_NAME}</strong>
-              <small>{SCHOOL_NAME}</small>
+              <strong>{SCHOOL_NAME}</strong>
+              <small>{PRODUCT_NAME}</small>
             </span>
           </a>
           <nav className="lp-links" aria-label={c.menu}>
             {navLinks.map((l) => <a key={l.href} href={l.href}>{l.label}</a>)}
           </nav>
           <div className="lp-actions">
-            <LanguageSwitcher className="lp-lang" />
-            <button type="button" className="lp-icon-btn" onClick={() => setTheme(nextTheme)} aria-label={nextTheme === 'light' ? c.themeLight : c.themeDark}>
-              {theme === 'dark'
-                ? <Icon path="M12 17a5 5 0 100-10 5 5 0 000 10zM12 1v2M12 21v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M1 12h2M21 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4" size={18} />
-                : <Icon path="M21 12.8A9 9 0 1111.2 3a7 7 0 009.8 9.8z" size={18} />}
-            </button>
-            <Link to="/login" className="lp-btn lp-btn-primary lp-login">{c.login}</Link>
-            <button type="button" className="lp-icon-btn lp-menu-btn" onClick={() => setMenuOpen((o) => !o)} aria-expanded={menuOpen} aria-label={menuOpen ? c.closeMenu : c.menu}>
-              <Icon path={menuOpen ? 'M18 6L6 18M6 6l12 12' : 'M4 6h16M4 12h16M4 18h16'} />
+            <LanguageSwitcher className="lang-switch-light lp-lang" />
+            <Link to="/login" className="lp-btn lp-btn-gold lp-login">{c.login}</Link>
+            <button type="button" className="lp-menu-btn" onClick={() => setMenuOpen((o) => !o)} aria-expanded={menuOpen} aria-label={menuOpen ? c.closeMenu : c.menu}>
+              <Icon path={menuOpen ? 'M18 6L6 18M6 6l12 12' : 'M4 6h16M4 12h16M4 18h16'} size={22} />
             </button>
           </div>
         </div>
         {menuOpen && (
           <div className="lp-sheet">
             {navLinks.map((l) => <a key={l.href} href={l.href} onClick={() => setMenuOpen(false)}>{l.label}</a>)}
-            <LanguageSwitcher className="lp-lang" />
-            <Link to="/login" className="lp-btn lp-btn-primary" onClick={() => setMenuOpen(false)}>{c.login}</Link>
+            <LanguageSwitcher className="lang-switch-light" />
+            <Link to="/login" className="lp-btn lp-btn-gold" onClick={() => setMenuOpen(false)}>{c.login}</Link>
           </div>
         )}
       </header>
 
       <main id="top">
         <section className="lp-hero">
-          <div className="wrap lp-hero-in">
+          <div className="lp-wrap lp-hero-in">
             <div className="lp-hero-copy">
-              <p className="lp-school">{SCHOOL_NAME}</p>
+              <div className="lp-date">
+                <strong>{now.getDate()}</strong>
+                <span>
+                  <b>{now.toLocaleDateString(locale, { weekday: 'long' })}</b>
+                  {now.toLocaleDateString(locale, { month: 'long', year: 'numeric' })}
+                </span>
+              </div>
               <h1>{c.heroTitle}</h1>
               <p className="lp-lead">{c.heroLead}</p>
               <div className="lp-cta-row">
-                <Link to="/login" className="lp-btn lp-btn-primary lp-btn-lg">{c.heroLogin}</Link>
-                <a href="#modul" className="lp-btn lp-btn-ghost lp-btn-lg">{c.heroSeeModules}</a>
+                <Link to="/login" className="lp-btn lp-btn-gold lp-btn-lg">{c.heroLogin}</Link>
+                <a href="#modul" className="lp-btn lp-btn-outline lp-btn-lg">{c.heroSeeModules}</a>
               </div>
               <p className="lp-note">{c.heroNote}</p>
             </div>
@@ -164,89 +132,93 @@ export default function Landing() {
         </section>
 
         <section className="lp-section" id="warga">
-          <div className="wrap">
+          <div className="lp-wrap">
             <Reveal className="lp-head">
               <h2>{c.peopleTitle}</h2>
               <p>{c.peopleDesc}</p>
             </Reveal>
-            <Reveal className="lp-people">
+            <div className="tile-row lp-people">
               {c.people.map((p) => (
-                <article key={p.key} className={`lp-person tone-${p.key}`}>
-                  <span className="lp-person-ic"><Icon path={PEOPLE_ICONS[p.key]} size={24} /></span>
-                  <h3>{p.title}</h3>
-                  <p className="lp-person-who">{p.who}</p>
-                  <ul>
+                <article key={p.key} className={`tile tile-${PEOPLE_LOOK[p.key].tone} lp-person`}>
+                  <div className="tile-head">
+                    <span className="tile-icon"><Icon path={PEOPLE_LOOK[p.key].icon} /></span>
+                    <h3 className="lp-person-title">{p.title}</h3>
+                  </div>
+                  <p className="tile-note lp-person-who">{p.who}</p>
+                  <ul className="lp-person-list">
                     {p.items.map((it) => <li key={it}>{it}</li>)}
                   </ul>
                 </article>
-              ))}
-            </Reveal>
-          </div>
-        </section>
-
-        <section className="lp-section lp-alt" id="modul">
-          <div className="wrap">
-            <Reveal className="lp-head">
-              <h2>{c.modulesTitle}</h2>
-              <p>{c.modulesDesc}</p>
-            </Reveal>
-            <div className="lp-modules">
-              {[['daily', c.groupDaily], ['school', c.groupSchool]].map(([group, label]) => (
-                <Reveal key={group} className="lp-module-group">
-                  <h3 className="lp-group-label">{label}</h3>
-                  <ul>
-                    {c.modules.filter((m) => m.group === group).map((m) => (
-                      <li key={m.key} className="lp-module">
-                        <span className={`lp-module-ic tone-${MODULE_LOOK[m.key].tone}`}><Icon path={MODULE_LOOK[m.key].icon} size={18} /></span>
-                        <div>
-                          <h4>{m.title}</h4>
-                          <p>{m.desc}</p>
-                          <p className="lp-module-roles">
-                            <span className="sr-only">{c.usedBy}: </span>
-                            {m.roles.map((r) => <span key={r} className="lp-role">{roleLabel[r]}</span>)}
-                          </p>
-                        </div>
-                      </li>
-                    ))}
-                  </ul>
-                </Reveal>
               ))}
             </div>
           </div>
         </section>
 
-        <section className="lp-section" id="hari">
-          <div className="wrap">
+        <section className="lp-section" id="modul">
+          <div className="lp-wrap">
             <Reveal className="lp-head">
-              <h2>{c.dayTitle}</h2>
-              <p>{c.dayDesc}</p>
+              <h2>{c.modulesTitle}</h2>
+              <p>{c.modulesDesc}</p>
             </Reveal>
-            <Reveal className="lp-timetable-wrap">
-              <table className="lp-timetable">
-                <caption className="sr-only">{c.dayCaption}</caption>
-                <thead>
-                  <tr>
-                    <th scope="col">{c.colWhen}</th>
-                    <th scope="col">{c.colWhat}</th>
-                    <th scope="col">{c.colWho}</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {c.day.map((d) => (
-                    <tr key={d.when}>
-                      <th scope="row">{d.when}</th>
-                      <td>{d.what}</td>
-                      <td><span className="lp-role">{d.who}</span></td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+            <Reveal className="content-card sheet lp-modules">
+              {[['daily', c.groupDaily], ['school', c.groupSchool]].map(([group, label]) => (
+                <div key={group} className="lp-module-group">
+                  <h3 className="card-heading">{label}</h3>
+                  <ul className="line-list">
+                    {c.modules.filter((m) => m.group === group).map((m) => (
+                      <li key={m.key} className="line-row line-row-static lp-module">
+                        <span className={`line-icon tone-${MODULE_LOOK[m.key].tone}`}><Icon path={MODULE_LOOK[m.key].icon} size={15} /></span>
+                        <span className="line-text">
+                          <strong>{m.title}</strong>
+                          <span>{m.desc}</span>
+                        </span>
+                        <span className="lp-roles">
+                          <span className="sr-only">{c.usedBy}: </span>
+                          {m.roles.map((r) => <span key={r} className="status-pill status-pill-idle">{roleLabel[r]}</span>)}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
             </Reveal>
           </div>
         </section>
 
-        <section className="lp-section lp-alt" id="bantuan">
-          <div className="wrap lp-help">
+        <section className="lp-section" id="hari">
+          <div className="lp-wrap">
+            <Reveal className="lp-head">
+              <h2>{c.dayTitle}</h2>
+              <p>{c.dayDesc}</p>
+            </Reveal>
+            <Reveal className="content-card lp-day">
+              <div className="table-wrap">
+                <table>
+                  <caption className="sr-only">{c.dayCaption}</caption>
+                  <thead>
+                    <tr>
+                      <th scope="col">{c.colWhen}</th>
+                      <th scope="col">{c.colWhat}</th>
+                      <th scope="col">{c.colWho}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {c.day.map((d) => (
+                      <tr key={d.when}>
+                        <td>{d.when}</td>
+                        <td>{d.what}</td>
+                        <td><span className="status-pill status-pill-idle">{d.who}</span></td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </Reveal>
+          </div>
+        </section>
+
+        <section className="lp-section" id="bantuan">
+          <div className="lp-wrap lp-help">
             <Reveal className="lp-head">
               <h2>{c.helpTitle}</h2>
               <p>{c.helpDesc}</p>
@@ -255,25 +227,29 @@ export default function Landing() {
                 <Link to="/pdpa">{c.privacy}</Link>
               </p>
             </Reveal>
-            <Reveal className="lp-faq">
-              {faqs.map((f) => <FaqItem key={f.q} q={f.q} a={f.a} />)}
+            <Reveal className="content-card">
+              <div className="faq-list">
+                {faqs.map((f) => <FaqItem key={f.q} q={f.q} a={f.a} />)}
+              </div>
             </Reveal>
           </div>
         </section>
 
-        <section className="lp-cta">
-          <div className="wrap lp-cta-in">
-            <div>
-              <h2>{c.ctaTitle}</h2>
-              <p>{c.ctaDesc}</p>
-            </div>
-            <Link to="/login" className="lp-btn lp-btn-gold lp-btn-lg">{c.heroLogin}</Link>
+        <section className="lp-section lp-section-last">
+          <div className="lp-wrap">
+            <Reveal className="lp-cta">
+              <div>
+                <h2>{c.ctaTitle}</h2>
+                <p>{c.ctaDesc}</p>
+              </div>
+              <Link to="/login" className="lp-btn lp-btn-gold lp-btn-lg">{c.heroLogin}</Link>
+            </Reveal>
           </div>
         </section>
       </main>
 
       <footer className="lp-foot">
-        <div className="wrap lp-foot-in">
+        <div className="lp-wrap lp-foot-in">
           <div className="lp-brand">
             <BrandMark />
             <span>
@@ -288,7 +264,7 @@ export default function Landing() {
             <Link to="/support">{c.helpMore}</Link>
           </nav>
         </div>
-        <div className="wrap lp-foot-bottom">&copy; {new Date().getFullYear()} {SCHOOL_NAME} · {PRODUCT_NAME}. {c.rights}</div>
+        <div className="lp-wrap lp-foot-bottom">&copy; {now.getFullYear()} {SCHOOL_NAME} · {PRODUCT_NAME}. {c.rights}</div>
       </footer>
     </div>
   )
