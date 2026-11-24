@@ -13,7 +13,6 @@
   --ink-500: #667085;
   --line: #e2e7f0;
   --bg: #eef2f8;
-  --band-h: 176px;
   /* Module tones: each module keeps one colour everywhere (tile, icon, chart).
      Solid = icon/bar fill, soft = tile background, edge = tile border. */
   --blue-solid: #2563c9;   --blue-soft: #eaf1fd;   --blue-edge: #d3e1f8;
@@ -158,13 +157,7 @@ a { color: inherit; text-decoration: none; }
 
 .sidebar-overlay { display: none; }
 
-/* The navy band behind the topbar and page title gives every page a
-   header zone; the first cards overlap its lower edge so content sits on
-   the band instead of floating on a bare background. */
-.main-col {
-  flex: 1; min-width: 0; display: flex; flex-direction: column;
-  background: linear-gradient(180deg, var(--navy-800) 0, var(--navy-800) var(--band-h), var(--bg) var(--band-h));
-}
+.main-col { flex: 1; min-width: 0; display: flex; flex-direction: column; overflow-x: clip; }
 
 .topbar-app {
   height: 60px; flex-shrink: 0;
@@ -417,15 +410,23 @@ tbody tr.row-status-pending:hover { background: rgba(224,70,63,.08); }
 
 .page-content { padding: 20px 24px 28px; max-width: 1180px; width: 100%; margin: 0 auto; }
 
-/* ---------- Page head (sits on the navy band) ---------- */
-.page-head { margin-bottom: 16px; min-height: 58px; }
+/* ---------- Page head on a navy band ----------
+   The band is drawn behind the page title and grows with it, so wrapped
+   titles on a phone never spill onto the light background. The first cards
+   overlap its lower edge (negative margin), giving every page a header zone
+   instead of a bare background. */
+.page-head, .dash-hero { position: relative; padding-bottom: 36px; margin-bottom: -22px; }
+.page-head::before, .dash-hero::before {
+  content: ""; position: absolute; z-index: -1; top: -120px; bottom: 0; left: -100vw; right: -100vw;
+  background: var(--navy-800);
+}
 .page-head h1 { font-size: 19px; color: #fff; margin-bottom: 4px; }
 .page-head p { color: rgba(255,255,255,.74); font-size: 13px; margin: 0; max-width: 720px; }
 
 /* ---------- Dashboard hero (greeting on the band) ---------- */
 .dash-hero {
-  margin-bottom: 16px; color: #fff; min-height: 58px;
-  display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;
+  color: #fff;
+  display: flex; align-items: center; justify-content: space-between; gap: 12px 16px; flex-wrap: wrap;
 }
 .dash-hero-text h1 { color: #fff; margin-bottom: 4px; font-size: 20px; }
 .dash-hero-text p { color: rgba(255,255,255,.74); margin: 0; font-size: 13px; }
@@ -459,7 +460,7 @@ tbody tr.row-status-pending:hover { background: rgba(224,70,63,.08); }
 .snapshot-warn { border-top-color: var(--gold-500); }
 
 /* ---------- Teacher dashboard layout ---------- */
-.teacher-dash-layout { display: grid; grid-template-columns: 1.5fr 1fr; gap: 14px; align-items: start; }
+.teacher-dash-layout { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: 14px; align-items: start; }
 .teacher-dash-layout .module-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px; }
 .module-launch {
   --solid: var(--blue-solid); --soft: var(--blue-soft); --edge: var(--blue-edge);
@@ -491,7 +492,7 @@ tbody tr.row-status-pending:hover { background: rgba(224,70,63,.08); }
 .activity-list-compact .activity-row-text span { font-size: 11px; }
 .activity-sidebar .muted { flex: 1; display: flex; align-items: center; justify-content: center; text-align: center; padding: 0; }
 @media (max-width: 960px) {
-  .teacher-dash-layout { grid-template-columns: 1fr; }
+  .teacher-dash-layout { grid-template-columns: minmax(0, 1fr); }
 }
 
 /* ---------- Module grid ---------- */
@@ -775,7 +776,7 @@ tbody tr:last-child td { border-bottom: none; }
 .stat-bad span { color: var(--danger); }
 
 /* ---------- Stat tiles (coloured, with icon and a small chart) ---------- */
-.tile-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; margin-bottom: 14px; }
+.tile-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 14px; }
 .tile {
   --solid: var(--blue-solid); --soft: var(--blue-soft); --edge: var(--blue-edge);
   background: var(--soft); border: 1px solid var(--edge); border-radius: var(--radius-md);
@@ -855,7 +856,8 @@ a.line-row:hover .line-chevron { color: var(--navy-900); }
 .tone-navy { background: var(--navy-soft); color: var(--navy-solid); }
 
 /* ---------- Admin overview ---------- */
-.admin-overview-grid { display: grid; grid-template-columns: 1.5fr 1fr; gap: 14px; align-items: start; }
+.admin-overview-grid { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: 14px; align-items: start; }
+.sheet-head { flex-wrap: wrap; }
 .admin-overview-side { display: flex; flex-direction: column; gap: 20px; }
 .admin-overview-side .content-card { margin-bottom: 0; }
 .quick-actions-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 12px; }
@@ -877,7 +879,7 @@ a.line-row:hover .line-chevron { color: var(--navy-900); }
 .activity-row-text { min-width: 0; }
 .activity-row-text strong { display: block; font-size: 13px; color: var(--navy-900); }
 .activity-row-text span { display: block; font-size: 12px; color: var(--ink-500); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-@media (max-width: 960px) { .admin-overview-grid { grid-template-columns: 1fr; } }
+@media (max-width: 960px) { .admin-overview-grid { grid-template-columns: minmax(0, 1fr); } }
 .chip { background: rgba(224,70,63,.08); color: var(--danger); font-size: 12.5px; font-weight: 600; padding: 6px 12px; border-radius: 999px; }
 
 /* ---------- Assembly code card ---------- */
@@ -1082,11 +1084,10 @@ a.line-row:hover .line-chevron { color: var(--navy-900); }
 }
 
 @media (max-width: 960px) {
-  .teacher-dash-layout { grid-template-columns: 1fr; }
+  .teacher-dash-layout { grid-template-columns: minmax(0, 1fr); }
 }
 
 @media (max-width: 780px) {
-  :root { --band-h: 168px; }
   .page-content { padding: 16px 16px 24px; }
   .tile-row { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
   .tile { padding: 12px 14px; }
