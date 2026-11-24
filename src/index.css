@@ -82,11 +82,16 @@ a { color: inherit; text-decoration: none; }
   flex-direction: column;
 }
 .sidebar-brand { display: flex; align-items: center; gap: 12px; padding: 0 8px 16px; border-bottom: 1px solid rgba(255,255,255,.1); margin-bottom: 10px; flex-shrink: 0; }
+/* App icon (BrandMark): the SVG draws its own badge; the box only sizes it
+   and gives it a soft drop shadow so it lifts off navy backgrounds too. */
 .brand-mark {
-  width: 42px; height: 42px; border-radius: 12px; flex-shrink: 0;
-  background: linear-gradient(160deg, var(--gold-400), var(--gold-500));
-  color: var(--navy-900); font-family: var(--font-head); font-weight: 700; font-size: 16px;
-  display: flex; align-items: center; justify-content: center;
+  width: 42px; height: 42px; flex-shrink: 0; display: block; border-radius: 23%;
+  box-shadow: 0 4px 12px -4px rgba(0, 0, 0, .45);
+}
+.brand-mark svg { display: block; }
+/* On navy panels a thin light ring keeps the navy badge from blending in. */
+.sidebar-brand .brand-mark, .login-showcase-brand .brand-mark {
+  box-shadow: 0 0 0 1.5px rgba(255, 255, 255, .22), 0 6px 14px -4px rgba(0, 0, 0, .5);
 }
 .sidebar-brand strong { display: block; font-size: 14.5px; color: #fff; font-family: var(--font-head); }
 .sidebar-brand span { font-size: 11.5px; color: rgba(255,255,255,.6); }
@@ -979,7 +984,7 @@ a.line-row:hover .line-chevron { color: var(--navy-900); }
 .login-back-link svg { transition: transform .15s ease; }
 .login-back-link:hover svg { transform: translateX(-2px); }
 .login-mobile-brand { display: none; }
-.login-mark { margin: 0 auto 18px; width: 56px; height: 56px; font-size: 20px; box-shadow: 0 6px 16px rgba(242,169,59,.35); }
+.login-mark { margin: 0 auto 18px; width: 60px; height: 60px; box-shadow: 0 10px 22px -8px rgba(11,31,63,.5); }
 .login-form-panel-inner h1 { font-size: 21px; }
 .login-sub { color: var(--ink-500); font-size: 13.5px; margin-bottom: 26px; }
 @media (max-width: 900px) {
@@ -1066,8 +1071,8 @@ a.line-row:hover .line-chevron { color: var(--navy-900); }
 .page-wipe.is-covering { transform: translateY(0); }
 .page-wipe.is-leaving { transform: translateY(-100%); transition-duration: .46s; }
 .page-wipe-mark {
-  display: grid; place-items: center; width: 64px; height: 64px; border-radius: 18px;
-  background: var(--gold-500); color: var(--navy-900); box-shadow: 0 12px 30px -10px rgba(0,0,0,.5);
+  display: block; width: 72px; height: 72px; border-radius: 23%;
+  box-shadow: 0 14px 34px -10px rgba(0,0,0,.6);
   transform: scale(.7); opacity: 0; transition: transform .35s var(--ease) .1s, opacity .25s ease .1s;
 }
 .page-wipe.is-covering .page-wipe-mark { transform: scale(1); opacity: 1; }

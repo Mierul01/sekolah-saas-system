@@ -7,10 +7,8 @@ const COVER_MS = 420
 const REVEAL_MS = 460
 let running = false
 
-const LOGO_SVG =
-  '<svg viewBox="0 0 24 24" width="30" height="30" fill="none" aria-hidden="true">' +
-  '<path d="M12 3L2 8l10 5 10-5-10-5z" fill="currentColor"/>' +
-  '<path d="M6 12.6V17c0 1.66 2.69 3 6 3s6-1.34 6-3v-4.4l-6 3-6-3z" fill="currentColor" opacity=".72"/></svg>'
+// The app icon (same drawing as BrandMark), served from public/icons.
+const LOGO_IMG = '<img src="/icons/icon.svg" width="72" height="72" alt="">'
 
 export function playPageWipe(navigate, to, options) {
   const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
@@ -24,7 +22,7 @@ export function playPageWipe(navigate, to, options) {
   const wipe = document.createElement('div')
   wipe.className = 'page-wipe'
   wipe.setAttribute('aria-hidden', 'true')
-  wipe.innerHTML = `<span class="page-wipe-mark">${LOGO_SVG}</span>`
+  wipe.innerHTML = `<span class="page-wipe-mark">${LOGO_IMG}</span>`
   document.body.appendChild(wipe)
 
   // Next frame so the browser sees the start position before animating.
