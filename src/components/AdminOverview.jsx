@@ -103,8 +103,13 @@ export default function AdminOverview() {
     setSession(snap.exists() ? snap.data() : null)
   }, () => setSession(null)), [today])
 
+  // Only teacher accounts count towards the e-RPH figures; an admin's own records don't.
+  const teacherIds = useMemo(() => new Set(teachers.map((tc) => tc.id)), [teachers])
   const erphToday = useMemo(() => erph.filter((r) => r.tarikh === today), [erph, today])
-  const erphSubmittedUids = useMemo(() => new Set(erphToday.map((r) => r.teacherUid)), [erphToday])
+  const erphSubmittedUids = useMemo(
+    () => new Set(erphToday.map((r) => r.teacherUid).filter((id) => teacherIds.has(id))),
+    [erphToday, teacherIds]
+  )
   const belumHantar = useMemo(() => teachers.filter((tc) => !erphSubmittedUids.has(tc.id)), [teachers, erphSubmittedUids])
   const mmiToday = useMemo(() => mmi.filter((r) => r.tarikh === today), [mmi, today])
   const activeToday = useMemo(() => {
@@ -113,7 +118,10 @@ export default function AdminOverview() {
   }, [erphToday, mmiToday, teachers])
 
   const distinctTeachers = (rows) => new Set(rows.map((r) => r.teacherUid)).size
-  const erphTrend = useMemo(() => dailyCounts(erph, 7, locale, distinctTeachers), [erph, locale])
+  const erphTrend = useMemo(
+    () => dailyCounts(erph.filter((r) => teacherIds.has(r.teacherUid)), 7, locale, distinctTeachers),
+    [erph, locale, teacherIds]
+  )
   const mmiTrend = useMemo(() => dailyCounts(mmi, 7, locale), [mmi, locale])
   const cocoTrend = useMemo(() => dailyCounts(coco, 7, locale), [coco, locale])
   const cocoStudents = useMemo(() => coco.reduce((sum, r) => sum + (Number(r.kehadiranPelajar) || 0), 0), [coco])
