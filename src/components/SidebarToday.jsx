@@ -22,7 +22,7 @@ export default function SidebarToday({ onNavigate }) {
   useEffect(() => {
     if (!isAdmin || !schoolId) return
     return onSnapshot(query(collection(db, 'users'), where('schoolId', '==', schoolId)), (snap) => {
-      setTeachers(snap.docs.map((d) => d.data()).filter((u) => u.role === 'guru').length)
+      setTeachers(new Set(snap.docs.filter((d) => d.data().role === 'guru').map((d) => d.id)))
     })
   }, [isAdmin, schoolId])
 
@@ -31,7 +31,7 @@ export default function SidebarToday({ onNavigate }) {
     const scope = isAdmin ? [] : [where('teacherUid', '==', user.uid)]
     const unsubErph = onSnapshot(
       query(collection(db, 'erph'), where('schoolId', '==', schoolId), where('tarikh', '==', today), ...scope),
-      (snap) => setErph(new Set(snap.docs.map((d) => d.data().teacherUid)).size)
+      (snap) => setErph(new Set(snap.docs.map((d) => d.data().teacherUid)))
     )
     const unsubMmi = onSnapshot(
       query(collection(db, 'mmi'), where('schoolId', '==', schoolId), where('tarikh', '==', today), ...scope),
@@ -50,13 +50,16 @@ export default function SidebarToday({ onNavigate }) {
 
   const loading = erph === null || mmi === null || checkins === null || session === undefined || (isAdmin && teachers === null)
   const sessionActive = Boolean(session?.active)
+  // Admin view counts teacher accounts only, matching the dashboard tiles.
+  const teacherTotal = teachers?.size ?? 0
+  const erphCount = !erph ? 0 : isAdmin ? [...erph].filter((id) => teachers?.has(id)).length : erph.size
 
   const rows = isAdmin
     ? [
         {
           key: 'erph', to: '/app/erph/dashboard', label: 'e-RPH',
-          value: t('sidebarToday.teachersOf', { n: erph, total: teachers }),
-          state: teachers > 0 && erph >= teachers ? 'done' : 'pending',
+          value: t('sidebarToday.teachersOf', { n: erphCount, total: teacherTotal }),
+          state: teacherTotal > 0 && erphCount >= teacherTotal ? 'done' : 'pending',
         },
         {
           key: 'mmi', to: '/app/mmi/dashboard', label: 'MMI',
@@ -72,8 +75,8 @@ export default function SidebarToday({ onNavigate }) {
     : [
         {
           key: 'erph', to: '/app/erph', label: 'e-RPH',
-          value: erph > 0 ? t('sidebarToday.submitted') : t('sidebarToday.notSubmitted'),
-          state: erph > 0 ? 'done' : 'pending',
+          value: erphCount > 0 ? t('sidebarToday.submitted') : t('sidebarToday.notSubmitted'),
+          state: erphCount > 0 ? 'done' : 'pending',
         },
         {
           key: 'mmi', to: '/app/mmi', label: 'MMI',
